@@ -1,0 +1,7 @@
+Dim 4
+Num_b 32
+Max_cycle 207
+C1 1.7
+C2 1.1
+Min_boundary -37 -17 -6 -4
+Max_boundary 33 12 8 4
