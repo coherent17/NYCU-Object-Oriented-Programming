@@ -1,21 +1,23 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdbool.h>
-#include <string.h>
+#include <iostream>
+#include <cstdio>
+#include <fstream>
+#include <string>
+
+using namespace std;
 
 #define MAX_GIFT_NAME_SIZE 50
 #define MAX_NAME_SIZE 50
 #define MAX_WANT_NAME_SIZE 50
 
 typedef struct _gift_node{
-    char gift_name[MAX_GIFT_NAME_SIZE];
+    string gift_name;
     bool good;
     bool given;
 }gift_node;
 
 typedef struct _student_node{
-    char name[MAX_NAME_SIZE];
-    char want_name[MAX_WANT_NAME_SIZE];
+    string name;
+    string want_name;
     gift_node *give;
     gift_node *get;
     struct _student_node *next;
@@ -28,61 +30,102 @@ typedef struct _mood_node{
 }mood_node;
 
 mood_node *createMoodNode(int mood_point){
-    mood_node *newnode = (mood_node *)malloc(sizeof(mood_node));
-    newnode->head = NULL;
+    mood_node *newnode = new mood_node;
     newnode->mood_point = mood_point;
-    newnode->next = NULL;
+    newnode->head = nullptr;
+    newnode->next = nullptr;
     return newnode;
 }
 
-gift_node *createGiftNode(char *gift_name, int good){
-    gift_node *newnode = (gift_node *)malloc(sizeof(gift_node));
-    strncpy(gift_name, newnode->gift_name, strlen(gift_name));
-    bool isgood = good == 1 ? 1 : 0;
-    newnode->good = good;
-    newnode->given = false;
+student_node *createStudentNode(string name, string want_name, string gift_name, gift_node *gift_addr){
+    student_node *Student = new student_node;
+    Student->name = name;
+    Student->want_name = want_name;
+    Student->give = gift_addr;
+    Student->get = nullptr;
+    Student->next = nullptr;
+    return Student;
 }
 
-void createList(mood_node **List){
-    mood_node *newnode = createMoodNode(-2);
-    *List = newnode;
-    mood_node *tail = newnode;
-
+void initList(mood_node *& List){
+    mood_node *tail = List;
+    mood_node *temp = createMoodNode(-2);
+    List = temp;
+    tail = temp;
     for(int i = -1; i <= 2; i++){
-        newnode = createMoodNode(i);
-        tail->next = newnode;
-        tail = newnode;
+        temp = createMoodNode(i);
+        tail->next = temp;
+        tail = temp;
     }
+}
+
+void insert_list(student_node **head, student_node *s){
+    s->next = *head;
+    *head = s;
 }
 
 void printList(mood_node *List){
     mood_node *temp = List;
     while(temp){
-        printf("%d ->\n", temp->mood_point);
+
+        if(temp->head){
+            cout << temp->mood_point << " -> ";
+            student_node *s = temp->head;
+            while(s){
+                cout << s->name;
+                if(temp->mood_point == 0) cout << "(0)";
+                if(s->next != nullptr){
+                    cout << " -> ";
+                }
+                s = s->next;
+            }
+            cout << endl;
+        }
         temp = temp->next;
     }
 }
 
-void parser(char *filename, int *student_num, mood_node **List){
+void printGiftList(gift_node *gifts, int student_num){
+    for(int i = 0; i < student_num; i++){
+        cout << gifts[i].gift_name << ": " << gifts[i].good << " " << gifts[i].given << endl;
+    }
+}
+
+void parser(char *filename, int &student_num, gift_node *&gifts, mood_node *&List){
     FILE *input = fopen(filename, "r");
-    int n;
-    fscanf(input, "%d", &n);
-    *student_num = n;
+    fscanf(input, "%d", &student_num);
 
-    createList(List);
+    gifts = new gift_node[student_num];
+    int gift_index = 0;
 
-    gift_node **gift_node_array = (gift_node **)malloc(sizeof(gift_node *) * n);
-    
-    for(int i = 0; i < n; i++){
-        char name[MAX_NAME_SIZE];
-        char want_received[MAX_NAME_SIZE];
-        char gift_name[MAX_GIFT_NAME_SIZE];
+    student_node *head = nullptr;
+
+    for(int i = 0; i < student_num; i++){
+        char name[MAX_NAME_SIZE], want_name[MAX_NAME_SIZE], gift_name[MAX_GIFT_NAME_SIZE];
         int good;
-        fscanf(input, "%s %s %s %d", name, want_received, gift_name, &good);
-        bool isgood = good == 1 ? 1 : 0;
-        createGiftNode(gift_name, isgood);
+        fscanf(input, "%s %s %s %d", name, want_name, gift_name, &good);
+        gift_node g;
+        g.gift_name = string(gift_name);
+        g.good = (good == 1) ? true : false;
+        g.given = false;
+        gifts[gift_index] = g;
+        student_node *s = createStudentNode(string(name), string(want_name), string(gift_name), &gifts[gift_index]);
+        insert_list(&head, s);
+        gift_index++;
+    }
+    //insert the linkedlist into mood_point = 0 position
+    mood_node *temp = List;
+    while(temp){
+        if(temp->mood_point == 0){
+            temp->head = head;
+            break;
+        }
+        temp = temp->next;
     }
 
+    //read the host's friend
+    string host[student_num];
+    fscanf(input, )
 
     fclose(input);
 }
@@ -90,13 +133,13 @@ void parser(char *filename, int *student_num, mood_node **List){
 
 int main(int argc, char *argv[]){
     
+    //create the list (mood_node linkedlist)
+    mood_node *List;
+    initList(List);
+    gift_node *gifts = nullptr;
+
     int student_num;
-    mood_node *List = NULL;
-    parser(argv[1], &student_num, &List);
-
-    createList(&List);
+    parser(argv[1], student_num, gifts, List);
     printList(List);
-
-
     return 0;
 }

@@ -13,7 +13,7 @@ do:
 	./p5 testcase/1.txt
 
 check:
-	$(CHECKCC) $(CHECKFLAGS) ./p5 1.txt
+	$(CHECKCC) $(CHECKFLAGS) ./p5 testcase/1.txt
 
 
 clean:
