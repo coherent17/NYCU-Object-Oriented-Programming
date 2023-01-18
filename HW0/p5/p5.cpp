@@ -163,12 +163,13 @@ void parser(char *filename, int &student_num, gift_node *&gifts, mood_node *&Lis
     fclose(input);
 }
 
-student_node *findPeople(string name, mood_node *List){
+student_node *findPeople(string name, mood_node *List, mood_node **headref){
     mood_node *temp = List;
     while(temp){
         student_node *s = temp->head;
         while(s){
             if(!name.compare(s->name)){
+                *headref = temp;
                 return s;
             }
             s = s->next;
@@ -178,36 +179,32 @@ student_node *findPeople(string name, mood_node *List){
     return nullptr;
 }
 
-student_node *removeStudentNode(mood_node *&List, string rm_name){
-    mood_node *temp = List;
-    while(temp){
+void removeStudentNode(mood_node **headref, string name){
+    student_node *head = (*headref)->head;
+    student_node *temp = head;
+    student_node *prev;
+    if(temp != NULL && !name.compare(temp->name)){
+        temp = temp->next;
+        (*headref)->head = temp;
+        return;
+    }
 
-        student_node *s = temp->head;
-
-        //if the delete node is head node:
-        if(!temp->head && !rm_name.compare(s->name)){
-            temp->head = 
-        }
-
-        while(s){
-            if(!temp->head && !rm_name.compare(s->name)){
-                break;
-            }
-            s = s->next;
-        }
-
+    while(temp != NULL && name.compare(temp->name)){
+        prev = temp;
         temp = temp->next;
     }
+    prev->next = temp->next;
 }
 
 void firstChange(host hostInfo, mood_node *&List){
-    for(int i = 0; i < 1; i++){
-        student_node *current = findPeople(hostInfo.names[i], List);
-        student_node *want_people = findPeople(current->want_name, List);
+    for(int i = 0; i < hostInfo.count; i++){
+        mood_node *cur_refhead, *want_refhead;
+        student_node *current = findPeople(hostInfo.names[i], List, &cur_refhead);
+        student_node *want_people = findPeople(current->want_name, List, &want_refhead);
         if(!want_people->give->given){
             want_people->give->given = true;
             current->get = want_people->give;
-
+            removeStudentNode(&cur_refhead, current->name);
         }
         cout << current->name << " " << want_people->give->gift_name << " " << want_people->give->good <<endl;
     }
@@ -228,5 +225,7 @@ int main(int argc, char *argv[]){
     printGiftList(gifts, student_num);
     firstChange(hostInfo, List);
     printGiftList(gifts, student_num);
+
+    printList(List);
     return 0;
 }
