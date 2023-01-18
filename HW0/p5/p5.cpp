@@ -118,17 +118,20 @@ void insert_list(mood_node **&head_addr, student_node *s, int mood_point){
     }
 }
 
-void parser(char *filename, int &student_num, gift_node *&gifts, mood_node *&List, mood_node **&head_addr, host &hostInfo){
+void parser(char *filename, int &student_num, gift_node *&gifts, mood_node *&List, mood_node **&head_addr, host &hostInfo, string *&name_order){
     FILE *input = fopen(filename, "r");
     fscanf(input, "%d", &student_num);
 
     gifts = new gift_node[student_num];
     int gift_index = 0;
+    name_order = new string[student_num];
+    int name_order_index = 0;
 
     for(int i = 0; i < student_num; i++){
         char name[MAX_NAME_SIZE], want_name[MAX_NAME_SIZE], gift_name[MAX_GIFT_NAME_SIZE];
         int good;
         fscanf(input, "%s %s %s %d", name, want_name, gift_name, &good);
+        name_order[name_order_index++] = string(name);
         gift_node g;
         g.gift_name = string(gift_name);
         g.good = (good == 1) ? true : false;
@@ -227,30 +230,24 @@ void firstChange(host hostInfo, mood_node *&List, mood_node **&head_addr){
 }
 
 void secondChange(gift_node *gifts, mood_node **&head_addr, int student_num, mood_node *&List){
-    student_node *head = head_addr[2]->head;
-    student_node *temp = head;
-
-    while(temp){
-
+    while(head_addr[2]->head){
         //find the gift for the rest in mood_point = 0
         for(int i = 0; i < student_num; i++){
-            if(gifts[i].given == true || temp->give == &gifts[i]) continue;
+            if(gifts[i].given == true || head_addr[2]->head->give == &gifts[i]) continue;
 
             else{
                 gifts[i].given = true;
-                temp->get = &gifts[i];
-                removeStudentNode(head_addr, temp->name, 0);
-                printList(List);
+                head_addr[2]->head->get = &gifts[i];
+                student_node *temp = head_addr[2]->head;
+                head_addr[2]->head = head_addr[2]->head->next;
                 if(gifts[i].good){
                     insert_list(head_addr, temp, 1);
                 }
                 else{
                     insert_list(head_addr, temp, -1);
                 }
-                printList(List);
             }
         }
-        temp = temp->next;
     }
 }
 
@@ -263,14 +260,39 @@ int main(int argc, char *argv[]){
 
     int student_num;
     host hostInfo;
-
-    parser(argv[1], student_num, gifts, List, head_addr, hostInfo);
+    string *name_order;
+    parser(argv[1], student_num, gifts, List, head_addr, hostInfo, name_order);
     printList(List);    //initial state: all mood point = 0
 
     firstChange(hostInfo, List, head_addr);
     printList(List);
 
     secondChange(gifts, head_addr, student_num, List);
+    printList(List);
 
+    for(int i = 0; i < student_num; i++){
+        cout << name_order[i] << " ";
+        int mood_point;
+        student_node *temp = findPeople(name_order[i], List, &mood_point);
+        cout << temp->get->gift_name << " ";
+
+        switch (mood_point){
+            case 2:
+                cout << ":)))" << endl;
+                break;
+
+            case 1:
+                cout << ":)" << endl;
+                break;
+
+            case -1:
+                cout << ":(" << endl;
+                break;
+
+            case -2:
+                cout << ":(((" << endl;
+                break;
+        }
+    }
     return 0;
 }
