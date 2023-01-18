@@ -2,12 +2,14 @@
 #include <cstdio>
 #include <fstream>
 #include <string>
+#include <string.h>
 
 using namespace std;
 
 #define MAX_GIFT_NAME_SIZE 50
 #define MAX_NAME_SIZE 50
 #define MAX_WANT_NAME_SIZE 50
+#define BUFFER_SIZE 1000
 
 typedef struct _gift_node{
     string gift_name;
@@ -28,6 +30,11 @@ typedef struct _mood_node{
     student_node *head;
     struct _mood_node *next;
 }mood_node;
+
+typedef struct _host{
+    int count;
+    string *names;
+}host;
 
 mood_node *createMoodNode(int mood_point){
     mood_node *newnode = new mood_node;
@@ -59,9 +66,15 @@ void initList(mood_node *& List){
     }
 }
 
-void insert_list(student_node **head, student_node *s){
-    s->next = *head;
-    *head = s;
+void insert_list(student_node **head, student_node **tail, student_node *s){
+    if(*head == nullptr){
+        *head = s;
+        *tail = s;
+    }
+    else{
+        (*tail)->next = s;
+        *tail = s;
+    }
 }
 
 void printList(mood_node *List){
@@ -91,7 +104,7 @@ void printGiftList(gift_node *gifts, int student_num){
     }
 }
 
-void parser(char *filename, int &student_num, gift_node *&gifts, mood_node *&List){
+void parser(char *filename, int &student_num, gift_node *&gifts, mood_node *&List, host &hostInfo){
     FILE *input = fopen(filename, "r");
     fscanf(input, "%d", &student_num);
 
@@ -99,6 +112,7 @@ void parser(char *filename, int &student_num, gift_node *&gifts, mood_node *&Lis
     int gift_index = 0;
 
     student_node *head = nullptr;
+    student_node *tail = nullptr;
 
     for(int i = 0; i < student_num; i++){
         char name[MAX_NAME_SIZE], want_name[MAX_NAME_SIZE], gift_name[MAX_GIFT_NAME_SIZE];
@@ -110,9 +124,10 @@ void parser(char *filename, int &student_num, gift_node *&gifts, mood_node *&Lis
         g.given = false;
         gifts[gift_index] = g;
         student_node *s = createStudentNode(string(name), string(want_name), string(gift_name), &gifts[gift_index]);
-        insert_list(&head, s);
+        insert_list(&head, &tail, s);
         gift_index++;
     }
+    fgetc(input);
     //insert the linkedlist into mood_point = 0 position
     mood_node *temp = List;
     while(temp){
@@ -124,12 +139,79 @@ void parser(char *filename, int &student_num, gift_node *&gifts, mood_node *&Lis
     }
 
     //read the host's friend
-    string host[student_num];
-    fscanf(input, )
+    char buffer[BUFFER_SIZE];
+    char buffer_copy[BUFFER_SIZE];
+    fscanf(input, "%[^\n]", buffer);
+    strncpy(buffer_copy, buffer, strlen(buffer));
 
+    int host_count = 0;
+    char *token = strtok(buffer, " ");
+    while(token != NULL){
+        host_count++;
+        token = strtok(NULL, " ");
+    }
+
+    hostInfo.count = host_count;
+    hostInfo.names = new string [host_count];
+
+    token = strtok(buffer_copy, " ");
+    int index = 0;
+    while(token != NULL){
+        hostInfo.names[index++] = string(token);
+        token = strtok(NULL, " ");
+    }
     fclose(input);
 }
 
+student_node *findPeople(string name, mood_node *List){
+    mood_node *temp = List;
+    while(temp){
+        student_node *s = temp->head;
+        while(s){
+            if(!name.compare(s->name)){
+                return s;
+            }
+            s = s->next;
+        }
+        temp = temp->next;
+    }
+    return nullptr;
+}
+
+student_node *removeStudentNode(mood_node *&List, string rm_name){
+    mood_node *temp = List;
+    while(temp){
+
+        student_node *s = temp->head;
+
+        //if the delete node is head node:
+        if(!temp->head && !rm_name.compare(s->name)){
+            temp->head = 
+        }
+
+        while(s){
+            if(!temp->head && !rm_name.compare(s->name)){
+                break;
+            }
+            s = s->next;
+        }
+
+        temp = temp->next;
+    }
+}
+
+void firstChange(host hostInfo, mood_node *&List){
+    for(int i = 0; i < 1; i++){
+        student_node *current = findPeople(hostInfo.names[i], List);
+        student_node *want_people = findPeople(current->want_name, List);
+        if(!want_people->give->given){
+            want_people->give->given = true;
+            current->get = want_people->give;
+
+        }
+        cout << current->name << " " << want_people->give->gift_name << " " << want_people->give->good <<endl;
+    }
+}
 
 int main(int argc, char *argv[]){
     
@@ -139,7 +221,12 @@ int main(int argc, char *argv[]){
     gift_node *gifts = nullptr;
 
     int student_num;
-    parser(argv[1], student_num, gifts, List);
-    printList(List);
+    host hostInfo;
+
+    parser(argv[1], student_num, gifts, List, hostInfo);
+    printList(List);    //initial state: all mood point = 0
+    printGiftList(gifts, student_num);
+    firstChange(hostInfo, List);
+    printGiftList(gifts, student_num);
     return 0;
 }
