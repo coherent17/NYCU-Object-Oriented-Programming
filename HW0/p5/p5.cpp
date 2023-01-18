@@ -57,7 +57,7 @@ student_node *createStudentNode(string name, string want_name, string gift_name,
 //create the list of mood_node and return the entry of the head
 mood_node **initList(mood_node *&List){
     int index = 0;
-    mood_node **head_addr = (mood_node **)malloc(sizeof(mood_node *) * 5);
+    mood_node **head_addr = new mood_node *[5];
     mood_node *tail = List;
     mood_node *temp = createMoodNode(-2);
     head_addr[index++] = temp;
@@ -251,6 +251,18 @@ void secondChange(gift_node *gifts, mood_node **&head_addr, int student_num, moo
     }
 }
 
+void deleteList(mood_node **&head_addr){
+    for(int i = 0; i < 5; i++){
+        while(head_addr[i]->head){
+            student_node *temp = head_addr[i]->head;
+            head_addr[i]->head = head_addr[i]->head->next;
+            delete temp;
+        }
+        delete head_addr[i];
+    }
+    delete [] head_addr;
+}
+
 int main(int argc, char *argv[]){
     
     //create the list (mood_node linkedlist)
@@ -294,5 +306,10 @@ int main(int argc, char *argv[]){
                 break;
         }
     }
+
+    delete [] name_order;
+    delete [] gifts;
+    delete [] hostInfo.names;
+    deleteList(head_addr);
     return 0;
 }
