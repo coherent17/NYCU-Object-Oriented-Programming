@@ -2,7 +2,7 @@
 #include <cstdio>
 #include <fstream>
 #include <string>
-#include <string.h>
+#include <cstring>
 
 using namespace std;
 
@@ -95,27 +95,21 @@ void printList(mood_node *List){
     cout << endl;
 }
 
-void insert_list(mood_node **&head_addr, student_node *s, int mood_point){
-    for(int i = 0; i < 5; i++){
-        if(head_addr[i]->mood_point == mood_point){
-            if(head_addr[i]->head == nullptr){
-                head_addr[i]->head = s;
-                s->next = nullptr;
-                break;
-            }
-            else{
-                student_node *temp = head_addr[i]->head;
-                while(temp){
-                    if(temp->next == nullptr) break;
-                    temp = temp->next;
-                }
-                temp->next = s;
-                s->next = nullptr;
-                break;
-            }
-        }
+void insert_In_Alphabet_Order(mood_node **&head_addr, student_node *node_to_insert, int mood_point){
 
+    if(head_addr[mood_point+2]->head == nullptr || strcmp(head_addr[mood_point+2]->head->name.c_str(), node_to_insert->name.c_str()) > 0){
+        node_to_insert->next = head_addr[mood_point+2]->head;
+        head_addr[mood_point+2]->head = node_to_insert;
+        return;
     }
+
+
+    student_node *current = head_addr[mood_point+2]->head;
+    while(current->next != nullptr && strcmp(current->next->name.c_str(), node_to_insert->name.c_str()) < 0){
+        current = current->next;
+    }
+    node_to_insert->next = current->next;
+    current->next = node_to_insert;
 }
 
 void parser(char *filename, int &student_num, gift_node *&gifts, mood_node *&List, mood_node **&head_addr, host &hostInfo, string *&name_order){
@@ -138,7 +132,7 @@ void parser(char *filename, int &student_num, gift_node *&gifts, mood_node *&Lis
         g.given = false;
         gifts[gift_index] = g;
         student_node *s = createStudentNode(string(name), string(want_name), string(gift_name), &gifts[gift_index]);
-        insert_list(head_addr, s, 0);
+        insert_In_Alphabet_Order(head_addr, s, 0);
         gift_index++;
     }
     fgetc(input);
@@ -219,11 +213,11 @@ void firstChange(host hostInfo, mood_node *&List, mood_node **&head_addr){
             removeStudentNode(head_addr, current->name, mood_point1);
             if(want_people->give->good){
                 current->get = want_people->give;
-                insert_list(head_addr, current, 2);
+                insert_In_Alphabet_Order(head_addr, current, 2);
             }
             else{
                 current->get = want_people->give;
-                insert_list(head_addr, current, -2);
+                insert_In_Alphabet_Order(head_addr, current, -2);
             }
         }
     }
@@ -241,10 +235,10 @@ void secondChange(gift_node *gifts, mood_node **&head_addr, int student_num, moo
                 student_node *temp = head_addr[2]->head;
                 head_addr[2]->head = head_addr[2]->head->next;
                 if(gifts[i].good){
-                    insert_list(head_addr, temp, 1);
+                    insert_In_Alphabet_Order(head_addr, temp, 1);
                 }
                 else{
-                    insert_list(head_addr, temp, -1);
+                    insert_In_Alphabet_Order(head_addr, temp, -1);
                 }
             }
         }
