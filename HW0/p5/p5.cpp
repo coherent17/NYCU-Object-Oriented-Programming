@@ -185,21 +185,20 @@ student_node *findPeople(string name, mood_node *List, int *index){
     return nullptr;
 }
 
-void removeStudentNode(mood_node **&head_addr, string name, int mood_point){
+void removeStudentNode(mood_node **&head_addr, student_node *node_to_remove, int mood_point){
     student_node *head = head_addr[mood_point + 2]->head;
-    student_node *temp = head;
-    student_node *prev;
-    if(temp != NULL && !name.compare(temp->name)){
-        head_addr[mood_point + 2]->head = temp->next;
-        return;
+    if(head == node_to_remove){
+        head_addr[mood_point + 2]->head = head_addr[mood_point + 2]->head->next;
     }
-
-    while(temp != NULL && name.compare(temp->name)){
-        prev = temp;
-        temp = temp->next;
+    else{
+        student_node *temp = head_addr[mood_point + 2]->head;
+        while(temp->next != nullptr){
+            if(temp->next == node_to_remove){
+                temp->next = temp->next->next;
+            }
+            temp = temp->next;
+        }
     }
-    prev->next = temp->next;
-    temp->next = nullptr;
 }
 
 void firstChange(host hostInfo, mood_node *&List, mood_node **&head_addr){
@@ -210,7 +209,7 @@ void firstChange(host hostInfo, mood_node *&List, mood_node **&head_addr){
         if(!want_people->give->given){
             want_people->give->given = true;
             current->get = want_people->give;
-            removeStudentNode(head_addr, current->name, mood_point1);
+            removeStudentNode(head_addr, current, mood_point1);
             if(want_people->give->good){
                 current->get = want_people->give;
                 insert_In_Alphabet_Order(head_addr, current, 2);
