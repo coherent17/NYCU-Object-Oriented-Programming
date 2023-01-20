@@ -244,6 +244,33 @@ void secondChange(gift_node *gifts, mood_node **&head_addr, int student_num, moo
     }
 }
 
+void output_mood(string *name_order, mood_node *List, int student_num){
+    for(int i = 0; i < student_num; i++){
+        cout << name_order[i] << " ";
+        int mood_point;
+        student_node *temp = findPeople(name_order[i], List, &mood_point);
+        cout << temp->get->gift_name << " ";
+
+        switch (mood_point){
+            case 2:
+                cout << ":)))" << endl;
+                break;
+
+            case 1:
+                cout << ":)" << endl;
+                break;
+
+            case -1:
+                cout << ":(" << endl;
+                break;
+
+            case -2:
+                cout << ":(((" << endl;
+                break;
+        }
+    }
+}
+
 void deleteList(mood_node **&head_addr){
     for(int i = 0; i < 5; i++){
         while(head_addr[i]->head){
@@ -275,30 +302,7 @@ int main(int argc, char *argv[]){
     secondChange(gifts, head_addr, student_num, List);
     printList(List);
 
-    for(int i = 0; i < student_num; i++){
-        cout << name_order[i] << " ";
-        int mood_point;
-        student_node *temp = findPeople(name_order[i], List, &mood_point);
-        cout << temp->get->gift_name << " ";
-
-        switch (mood_point){
-            case 2:
-                cout << ":)))" << endl;
-                break;
-
-            case 1:
-                cout << ":)" << endl;
-                break;
-
-            case -1:
-                cout << ":(" << endl;
-                break;
-
-            case -2:
-                cout << ":(((" << endl;
-                break;
-        }
-    }
+    output_mood(name_order, List, student_num);
 
     delete [] name_order;
     delete [] gifts;
