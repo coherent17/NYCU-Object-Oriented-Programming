@@ -4,10 +4,11 @@
 #define BUFFER_SIZE 20
 #define NUM_GROUP 8
 #define TEAMS_PER_GROUP 4
-#define FIRST_MATCH_ROUND 48
+#define GROUP_MATCH_ROUND 48
 #define WIN_POINTS 3
 #define DRAW_POINTS 1
 #define NOT_FOUND -1
+#define NUM_MATCH 15
 
 using namespace std;
 
@@ -20,6 +21,19 @@ typedef struct _group{
     int first_place = NOT_FOUND;
     int second_place = NOT_FOUND;
 }group;
+
+
+//match element in knonkout stage
+typedef struct _match{
+    bool isPK = false;
+    bool complete = true;
+    int score1;
+    int score2;
+    int PKscore1;
+    int PKscore2;
+}match;
+
+
 
 bool cmp(pair<int, int> x, pair <int, int> y){
     if (x.first != y.first){
@@ -48,8 +62,7 @@ void findWinners(group &g){
     }
 }
 
-void GroupMatch(char *filename, group *&groups, map<string, pair<int, int>> &groupID){
-    FILE *input = fopen(filename, "r");
+void GroupMatch(FILE *input, group *&groups, map<string, pair<int, int>> &groupID){
 
     //read the team in the same group
     for(int i = 0; i < NUM_GROUP; i++){
@@ -61,7 +74,7 @@ void GroupMatch(char *filename, group *&groups, map<string, pair<int, int>> &gro
         }
     }
 
-    for(int i = 0; i < FIRST_MATCH_ROUND; i++){
+    for(int i = 0; i < GROUP_MATCH_ROUND; i++){
         int score1, score2;
         char t1[MAX_TEAM_NAME_SIZE], t2[MAX_TEAM_NAME_SIZE];
         char buffer[BUFFER_SIZE];   //read vs
@@ -92,9 +105,15 @@ void GroupMatch(char *filename, group *&groups, map<string, pair<int, int>> &gro
     for(int i = 0; i < NUM_GROUP; i++){
         findWinners(groups[i]);
     }
-    
+}
 
-    fclose(input);
+void KnockoutStage(FILE *input, match *&matches){
+    char buffer[BUFFER_SIZE] = {"\0"};
+    while(fscanf(input, "%[^\n]", buffer) != EOF){
+        if(!strcmp(buffer, "=")) break;
+        fgetc(input);
+        cout << buffer << endl;
+    }
 }
 
 void printGroup(group *groups){
@@ -131,9 +150,15 @@ int main(int argc, char *argv[]){
     group *groups = new group[NUM_GROUP];
     map<string, pair<int, int>> groupID;
 
-    GroupMatch(argv[1], groups, groupID);
+    FILE *input = fopen(argv[1], "r");
+
+    GroupMatch(input, groups, groupID);
     printGroup(groups);
 
+    match *matches = new match[NUM_MATCH];
+    KnockoutStage(input, matches);
+
+    fclose(input);
     delete [] groups;
     return 0;
 }
