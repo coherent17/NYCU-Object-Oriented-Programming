@@ -6,7 +6,7 @@ BIN = p4
 
 all: $(BIN)
 
-p5: p5.cpp
+p4: p4.cpp
 	$(CC) $(CXXFLAGS) $< -o $@
 
 do1:
