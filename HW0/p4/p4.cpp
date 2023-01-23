@@ -26,7 +26,6 @@ typedef struct _group{
 
 //match element in knonkout stage
 typedef struct _match{
-    int teams_index = 0;
     string teams[TEAMS_PER_MATCH];
     int score1 = NOT_FOUND;
     int score2 = NOT_FOUND;
@@ -123,11 +122,47 @@ void getScore(string s1, string s2, int &score1, int &score2){
     }
 }
 
-void KnockoutStage(FILE *input, match *&matches, group *groups){
+void getWinner(match *&matches, int match_index1, int match_index2, int curr_match){
+    match m1 = matches[match_index1];
+    if(m1.score1 != NOT_FOUND){
+        matches[curr_match].teams[0] = m1.score1 > m1.score2 ? m1.teams[0] : m1.teams[1];
+    }
+    else{
+        matches[curr_match].teams[0] = string("TBD");
+    }
+
+    match m2 = matches[match_index2];
+    if(m2.score1 != NOT_FOUND){
+        matches[curr_match].teams[1] = m2.score1 > m2.score2 ? m2.teams[0] : m2.teams[1];
+    }
+    else{
+        matches[curr_match].teams[1] = string("TBD");
+    }
+}
+
+void outputAnswer(FILE *output, match *matches){
+    for(int i = 0; i < NUM_MATCH; i++){
+        if(!matches[i].teams[0].compare(string("TBD")) || !matches[i].teams[1].compare(string("TBD")) || matches[i].score1 == NOT_FOUND){
+            fprintf(output, "%s v.s. %s\tThe game is coming soon...\n", matches[i].teams[0].c_str(), matches[i].teams[1].c_str());
+            continue;
+        }
+        fprintf(output, "%s v.s. %s", matches[i].teams[0].c_str(), matches[i].teams[1].c_str());
+        if(matches[i].score1 > matches[i].score2){
+            fprintf(output, "\tThe winner is %s\n", matches[i].teams[0].c_str());
+        }
+        else{
+            fprintf(output, "\tThe winner is %s\n", matches[i].teams[1].c_str());
+        }
+    }
+    fprintf(output, "=\n");
+}
+
+void KnockoutStage(FILE *input, match *&matches, group *groups, FILE *output){
     char s1[BUFFER_SIZE] = {"\0"};
     char vs[BUFFER_SIZE] = {"\0"};
     char s2[BUFFER_SIZE] = {"\0"};
     int match_index = 0;
+    int valid_score_count = 0;
     while(fscanf(input, "%s", s1) != EOF){
         if(!strcmp(s1, "=")) break;
         else{
@@ -141,6 +176,7 @@ void KnockoutStage(FILE *input, match *&matches, group *groups){
         match_index++;
     }
     fgetc(input);
+    valid_score_count = match_index;
 
     //read the drawing case into the matches
     char buffer[BUFFER_SIZE];
@@ -159,28 +195,66 @@ void KnockoutStage(FILE *input, match *&matches, group *groups){
         index = 0;
 
         //init the match
-        for(int i = 0; i < NUM_GROUP; i++){
-            matches[i].teams[0] = "";
-            matches[i].teams[1] = "";
-            matches[i].teams_index = 0;
+        for(int i = 0; i < NUM_MATCH; i++){
+            matches[i].teams[0] = string("TBD");
+            matches[i].teams[1] = string("TBD");
+        }
+
+        for(int i = valid_score_count; i < NUM_MATCH; i++){
+            matches[i].score1 = NOT_FOUND;
+            matches[i].score2 = NOT_FOUND;
         }
 
         //traverse through the first place in the groups
         for(int i = 0; i < NUM_GROUP; i++){
-            int match_index = int((draw_straw_result[index] + 1) / 2) - 1;
-            cout << match_index << " " << matches[match_index].teams_index << endl;
-            matches[match_index].teams[matches[match_index].teams_index] = groups[i].teams[groups[i].first_place];
-            matches[match_index].teams_index++;
+            int match_index;
+            if(draw_straw_result[index] % 2 == 1){
+                match_index = int((draw_straw_result[index] + 1) / 2) - 1;
+                matches[match_index].teams[0] = groups[i].teams[groups[i].first_place];
+            }
+            else{
+                match_index = int((draw_straw_result[index]) / 2) - 1;
+                matches[match_index].teams[1] = groups[i].teams[groups[i].first_place];
+            }
             index++;
         }
 
         //traverse through the second place in the groups
         for(int i = 0; i < NUM_GROUP; i++){
-            int match_index = int((draw_straw_result[index] + 1) / 2) - 1;
-            matches[match_index].teams[matches[match_index].teams_index] = groups[i].teams[groups[i].second_place];
-            matches[match_index].teams_index++;
+            int match_index;
+            if(draw_straw_result[index] % 2 == 1){
+                match_index = int((draw_straw_result[index] + 1) / 2) - 1;
+                matches[match_index].teams[0] = groups[i].teams[groups[i].second_place];
+            }
+            else{
+                match_index = int((draw_straw_result[index]) / 2) - 1;
+                matches[match_index].teams[1] = groups[i].teams[groups[i].second_place];
+            }
             index++;
         }
+
+        //match 9
+        getWinner(matches, 0, 1, 8);
+
+        //match 10
+        getWinner(matches, 2, 3, 9);
+
+        //match 11
+        getWinner(matches, 4, 5, 10);
+
+        //match 12
+        getWinner(matches, 6, 7, 11);
+
+        //match 13
+        getWinner(matches, 8, 9, 12);
+
+        //match 14
+        getWinner(matches, 10, 11, 13);
+
+        //match 15
+        getWinner(matches, 12, 13, 14);
+
+        outputAnswer(output, matches);
 
     }
 }
@@ -218,25 +292,33 @@ void printGroup(group *groups){
 void printMatch(match *matches){
     for(int i = 0; i < NUM_MATCH; i++){
         cout << "Match " << i + 1 << " : ";
+        if(!matches[i].teams[0].compare(string("TBD")) || !matches[i].teams[1].compare(string("TBD")) || matches[i].score1 == NOT_FOUND){
+            cout << matches[i].teams[0] << " v.s. " << matches[i].teams[1];
+            cout << "\tThe game is coming soon..." << endl;
+            continue;
+        }
         cout << matches[i].teams[0] << " v.s. " << matches[i].teams[1];
         if(matches[i].score1 > matches[i].score2) cout << "\tThe winner is " << matches[i].teams[0] << endl;
         else cout << "\tThe winner is " << matches[i].teams[1] << endl; 
     }
 }
 
+
+
 int main(int argc, char *argv[]){
     group *groups = new group[NUM_GROUP];
     map<string, pair<int, int>> groupID;
 
     FILE *input = fopen(argv[1], "r");
+    FILE *output = fopen(argv[2], "w");
 
     GroupMatch(input, groups, groupID);
-    printGroup(groups);
+    //printGroup(groups);
 
     match *matches = new match[NUM_MATCH];
-    KnockoutStage(input, matches, groups);
-    printMatch(matches);
+    KnockoutStage(input, matches, groups, output);
     fclose(input);
+    fclose(output);
     delete []groups;
     delete []matches;
     return 0;
