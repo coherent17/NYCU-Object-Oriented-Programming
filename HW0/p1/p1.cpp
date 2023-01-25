@@ -1,52 +1,55 @@
-#include <stdio.h>
-#include <stdlib.h>
+#include<bits/stdc++.h>
 
-#define BUFFER_SIZE 1000
+using namespace std;
 
-typedef struct _point{
-    int x; 
-    int y;
-}point;
+#define EMPTY 0
 
-typedef struct _partial_image{
-    point p;
-    int joint[4];         //leftJoint, topJoint, rightJoint, downJoint
-    char *character;     //image
-} partial_image;
+int partial_img_size = EMPTY;
 
-void parser(char *filename, int *partial_image_size, int *partial_image_count){
+typedef struct _partial_img{
+    int leftJoint = EMPTY;
+    int topJoint = EMPTY;
+    int rightJoint = EMPTY;
+    int downJoint = EMPTY;
+    string msg;
+}partial_img;
+
+void parser(char *filename, vector<partial_img> &img){
     FILE *input = fopen(filename, "r");
-    fscanf(input, "%d", &(*partial_image_size));
-    fgetc(input);
+    fscanf(input, "%d", &partial_img_size);
 
-    //calculate how many partial image first:
-    char buffer[BUFFER_SIZE];
-    while(fscanf(input, "%[^\n]", buffer) != EOF){
+    int leftJoint, topJoint, rightJoint, downJoint;
+    char *msg = new char [partial_img_size * partial_img_size];
+
+    while(fscanf(input, "%d %d %d %d %[^\n]", &leftJoint, &topJoint, &rightJoint, &downJoint, msg) != EOF){
+        partial_img temp;
+        temp.leftJoint = leftJoint;
+        temp.topJoint = topJoint;
+        temp.rightJoint = rightJoint;
+        temp.downJoint = downJoint;
+        temp.msg = string(msg).substr(1, partial_img_size * partial_img_size);
+        img.push_back(temp);
         fgetc(input);
-        (*partial_image_count)++;
     }
+    delete msg;
     fclose(input);
+}
 
-    //store the partial image
-    partial_image *ret = (partial_image *)malloc(sizeof(partial_image) * (*partial_image_count));
-    input = fopen(filename, "r");
-    fscanf(input, "%d", &(*partial_image_size));
-    fgetc(input);
+ostream& operator<<(ostream& out, partial_img& p){
+    out << p.leftJoint << " " << p.topJoint << " " << p.rightJoint << " " << p.downJoint << " " << p.msg << endl;
+    return out;
+}
 
-    for(int i = 0; i < (*partial_image_count); i++){
-        int leftJoint, topJoint, rightJoint, downJoint;
-        fscanf(input, "%d %d %d %d %s", &leftJoint, &topJoint, &rightJoint, &downJoint, buffer);
-        
-        partial_image temp;
-        temp.p
-    }
-
+void printImg(vector<partial_img> img){
+    for(partial_img p : img){
+        cout << p;
+    } 
 }
 
 int main(int argc, char *argv[]){
-    int partial_image_size = 0;
-    int partial_image_count = 0;
-    parser(argv[1], &partial_image_size, &partial_image_count);
-    printf("%d %d\n", partial_image_size, partial_image_count);
+    vector<partial_img> img;
+    parser(argv[1], img);
+    printImg(img);
+    
     return 0;
 }
