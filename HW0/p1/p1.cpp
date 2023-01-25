@@ -24,15 +24,22 @@ void parser(char *filename, vector<partial_img> &img, unordered_map <int, int> &
     fscanf(input, "%d", &partial_img_size);
     int count = 0;
     int leftJoint, topJoint, rightJoint, downJoint;
-    char *msg = new char [partial_img_size * partial_img_size];
+    char *msg = new char [partial_img_size * partial_img_size + 1];
 
-    while(fscanf(input, "%d %d %d %d %[^\n]", &leftJoint, &topJoint, &rightJoint, &downJoint, msg) != EOF){
+    while(fscanf(input, "%d %d %d %d ", &leftJoint, &topJoint, &rightJoint, &downJoint) != EOF){
+        fscanf(input, "\"");
+        for(int i = 0; i < partial_img_size * partial_img_size; i++){
+            fscanf(input, "%c", &msg[i]);
+        }
+        msg[partial_img_size * partial_img_size] = '\0';
+        fscanf(input, "\"");
+
         partial_img temp;
         temp.leftJoint = leftJoint;
         temp.topJoint = topJoint;
         temp.rightJoint = rightJoint;
         temp.downJoint = downJoint;
-        temp.msg = string(msg).substr(1, partial_img_size * partial_img_size);
+        temp.msg = string(msg).substr(0, partial_img_size * partial_img_size);
         img.push_back(temp);
         fgetc(input);
         if(leftJoint != 0) JointID.insert(make_pair(leftJoint, count));
@@ -42,7 +49,7 @@ void parser(char *filename, vector<partial_img> &img, unordered_map <int, int> &
 
         count++;
     }
-    delete msg;
+    delete []msg;
     fclose(input);
 }
 
@@ -105,7 +112,7 @@ void rightRotate(vector<partial_img> &img, int idx){
         }
     }
 
-    char *New_msgArray = new char[partial_img_size * partial_img_size];
+    char *New_msgArray = new char[partial_img_size * partial_img_size + 1];
 
     int index = 0;
 
@@ -114,8 +121,7 @@ void rightRotate(vector<partial_img> &img, int idx){
             New_msgArray[index++] = msg2DArray[i][j];
         }
     }
-
-
+    New_msgArray[partial_img_size * partial_img_size] = '\0';
 
     //put it back to original array
     temp.leftJoint = downJoint;
@@ -126,10 +132,10 @@ void rightRotate(vector<partial_img> &img, int idx){
     img[idx] = temp;
 
     for(int i = 0; i < partial_img_size; i++){
-        delete msg2DArray[i];
+        delete []msg2DArray[i];
     }
     delete []msg2DArray;
-    delete New_msgArray;
+    delete []New_msgArray;
 }
 
 bool checkFinish(partial_img p){
@@ -282,6 +288,7 @@ int **getPartialImagePlacement(vector<partial_img> img, int left_top_index, int 
         }
     }
 
+    delete []flatten_result;
     return partial_image_placement;
 }
 
@@ -304,7 +311,7 @@ void outputAnswer(char *filename, int **partial_image_placement, vector<partial_
 
 void free_partial_image_placement(int **partial_image_placement, int row){
     for(int i = 0; i < row; i++){
-        delete partial_image_placement[i];
+        delete []partial_image_placement[i];
     }
     delete []partial_image_placement;
 }
