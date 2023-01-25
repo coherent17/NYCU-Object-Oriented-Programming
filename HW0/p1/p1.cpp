@@ -215,19 +215,109 @@ void BFS(vector<partial_img> &img, unordered_map <int, int> JointID){
         }
 
     }
+}
 
+//find the left top most partial_img
+int left_top(vector<partial_img> img){
+    int idx = 0;
+    while(img[idx].left != EMPTY){
+        idx = img[idx].left;
+    }
+
+    while(img[idx].top != EMPTY){
+        idx = img[idx].top;
+    }
+    return idx;
+}
+
+int **getPartialImagePlacement(vector<partial_img> img, int left_top_index, int &row, int &col){
+    row = 1;
+    col = 1;
+
+    //calculate img row
+    int idx = left_top_index;
+    while(img[idx].right != EMPTY){
+        idx = img[idx].right;
+        col++;
+    }
+
+    //calculate img col
+    idx = left_top_index;
+    while(img[idx].down != EMPTY){
+        idx = img[idx].down;
+        row++;
+    }
+
+    int **partial_image_placement = new int *[row];
+    for(int i = 0; i < row; i++){
+        partial_image_placement[i] = new int[col];
+    }
+
+    int *flatten_result = new int[img.size()];
+    int flatten_result_index = 0;
+
+    idx = left_top_index;
+    int head_idx = idx;
+
+    while(img[head_idx].down != EMPTY){
+        while(img[idx].right != EMPTY){
+            flatten_result[flatten_result_index++] = idx;
+            idx = img[idx].right;
+        }
+        flatten_result[flatten_result_index++] = idx;
+        idx = img[head_idx].down;
+        head_idx = img[head_idx].down;
+    }
+
+    while(img[idx].right != EMPTY){
+        flatten_result[flatten_result_index++] = idx;
+        idx = img[idx].right;
+    }
+    flatten_result[flatten_result_index++] = idx;
+
+    flatten_result_index = 0;
+    for(int i = 0; i < row; i++){
+        for(int j = 0; j < col; j++){
+            partial_image_placement[i][j] = flatten_result[flatten_result_index++];
+        }
+    }
+
+    return partial_image_placement;
+}
+
+void outputAnswer(char *filename, int **partial_image_placement, vector<partial_img> img, int row, int col){
+    
+    FILE *output = fopen(filename, "w");
+    
+    for(int i = 0; i < row; i++){
+        for(int j = 0; j < partial_img_size; j++){
+            for(int k = 0; k < col; k++){
+                for(int l = 0; l < partial_img_size; l++){
+                    fprintf(output, "%c", img[partial_image_placement[i][k]].msg.c_str()[j * partial_img_size + l]);
+                }
+            }
+            fprintf(output, "\n");
+        }
+    }
+    fclose(output);
+}
+
+void free_partial_image_placement(int **partial_image_placement, int row){
+    for(int i = 0; i < row; i++){
+        delete partial_image_placement[i];
+    }
+    delete []partial_image_placement;
 }
 
 int main(int argc, char *argv[]){
     vector<partial_img> img;
-
-    //map the joint ID to partial img
+    int row, col;
     unordered_map <int, int> JointID;
     parser(argv[1], img, JointID);
-    printImg(img);
-
     BFS(img, JointID);
-    printImg(img);
-
+    int left_top_partial_img_idx = left_top(img);
+    int **partial_image_placement = getPartialImagePlacement(img, left_top_partial_img_idx, row, col);
+    outputAnswer(argv[2], partial_image_placement, img, row, col);
+    free_partial_image_placement(partial_image_placement, row);
     return 0;
 }

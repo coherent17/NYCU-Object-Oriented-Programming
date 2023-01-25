@@ -21,9 +21,15 @@ do3:
 do4:
 	./p1 testcase/4.in testcase/4.out
 
+doall:
+	make do1
+	make do2
+	make do3
+	make do4
+
 check:
-	$(CHECKCC) $(CHECKFLAGS) ./p1 1.in 1.out
+	$(CHECKCC) $(CHECKFLAGS) ./p1 testcase/1.in testcase/1.out
 
 
 clean:
-	rm p1  *.out
+	rm p1  testcase/*.out
