@@ -33,7 +33,7 @@ void parser(char *filename, vector <cell> &cells, vector <int> &entrys){
             cell temp;
             temp.layer = layer;
             temp.id = cell_count + i;
-            temp.cost = state[i] == 0 ? INT_MAX : state[i];
+            temp.cost = state[i] == 0 ? 99999 : state[i];
             temp.layer_size = int(state.size());
 
             if(i == 0){
@@ -106,20 +106,65 @@ void findVerticalNeighbor(vector <cell> &cells, vector <int> entrys){
         cout << cells[layer1_index].layer_size << " " << cells[layer2_index].layer_size << endl;
 
         if(cells[layer1_index].layer_size != cells[layer2_index].layer_size){
-            for(int j = layer1_index; j < cells[layer1_index].id + cells[layer1_index].layer_size; j = j + 2){
+            for(int j = layer1_index; layer2_push_back_index != layer1_index; j = j + 2){
                 cells[j].neighbors.push_back(layer2_push_back_index);
                 cells[j + 1].neighbors.push_back(layer2_push_back_index++);
             }
         }
         else{
-            for(int j = layer1_index; j < cells[layer1_index].id + cells[layer1_index].layer_size; j++){
+            for(int j = layer1_index; layer2_push_back_index != layer1_index; j++){
                 cells[j].neighbors.push_back(layer2_push_back_index++);
             }
         }
     }
 }
 
+void Dijkstra(vector <cell> cells, vector <int> &distance, vector <int> &parent, int start){
+    
+    vector <bool> visited(cells.size(), false);
+    
+    int curr = start;
+    distance[start] = cells[start].cost;
+    
+    while(!visited[curr]){
+        visited[curr] = true;
+        vector<int> currNeighbors = cells[curr].neighbors;
+        for(size_t i = 0; i < currNeighbors.size(); i++){
+            if(distance[curr] + cells[currNeighbors[i]].cost < distance[currNeighbors[i]]){
+                distance[currNeighbors[i]] = distance[curr] + cells[currNeighbors[i]].cost;
+                parent[currNeighbors[i]] = curr;
+            }
+        }
 
+        int min_dist = INT_MAX;
+        for(size_t i = 0; i < cells.size(); i++){
+            if(!visited[i] && (distance[i] < min_dist)){
+                curr = i;
+                min_dist = distance[i];
+            }
+        }
+    }
+}
+
+int findExit(vector <cell> cells, vector <int> entrys){
+    int start_index = entrys[entrys.size() - 1];
+    cout << start_index << " " << cells[start_index].id + cells[start_index].layer_size << endl;
+
+    for(int i = start_index; i < cells[start_index].id + cells[start_index].layer_size; i++){
+        if(cells[i].cost != 99999) return i;
+    }
+    
+    return -1;
+}
+
+void printPath(vector <int> parent, int exit_index){
+    if(parent[exit_index] == -1){
+        cout << exit_index << " ";
+        return;
+    }
+    printPath(parent, parent[exit_index]);
+    cout << exit_index << " ";
+}
 
 
 int main(int argc, char *argv[]){
@@ -130,6 +175,19 @@ int main(int argc, char *argv[]){
 
     findVerticalNeighbor(cells, entrys);
     printCells(cells);
-    // findShortestPath();
+
+
+    vector <int> distance(cells.size(), INT_MAX);
+    vector <int> parent(cells.size(), -1);
+    Dijkstra(cells, distance, parent, 1);
+    
+
+    //find the exit
+    int exit_index = findExit(cells, entrys);
+    cout << exit_index << endl;
+    cout << distance[exit_index] << endl;
+
+    printPath(parent, exit_index);
+    cout << endl;
     return 0;
 }
