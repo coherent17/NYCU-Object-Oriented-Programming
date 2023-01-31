@@ -34,6 +34,11 @@ double ***R1, ***R2;
 
 //iterate variable
 double *w;
+double **p;             //p_i: the best position that bird i has ever been
+double *p_best_loss;    //record the best cost for individual bird i
+
+double *g;              // the best position that this flock of the birds have ever been
+double g_best_loss = DBL_MAX;     //record the best cost for global cost
 
 void readSet(char *filename){
     char buffer[BUFFER_SIZE];
@@ -66,30 +71,6 @@ void readData(char *filename){
 
     for(int i = 0; i < N; i++){
         fscanf(data, "%d %lf", &points[i].x, &points[i].y);
-    }
-}
-
-void printSetParameter(){
-    cout << "Dim " << Dim << endl;
-    cout << "Num_b " << Num_b << endl;
-    cout << "Max_cycle " << Max_cycle << endl;
-    cout << "C1 " << C1 << endl;
-    cout << "C2 " << C2 << endl;
-    cout << "Min_boundary ";
-    for(int i = 0; i < Dim; i++){
-        cout << Min_boundary[i] << " ";
-    }
-    cout << endl << "Max_boundary ";
-    for(int i = 0; i < Dim; i++){
-        cout << Max_boundary[i] << " ";
-    }
-    cout << endl;
-}
-
-void printDataParameter(){
-    cout << N << endl;
-    for(int i = 0; i < N; i++){
-        cout << points[i].x << " " << points[i].y << endl;
     }
 }
 
@@ -160,21 +141,97 @@ void readR2(char *filename){
     fclose(rand);
 }
 
+double R(double *p, int x){
+    double ret = 0;
+    for(int i = 0; i < Dim; i++){
+        ret += p[i] * pow(x, i);
+    }
+    return ret;
+}
+
+double loss(double *p){
+    double ret = 0;
+    for(int i = 0; i < N; i++){
+        ret += abs(points[i].y - R(p, points[i].x));
+    }
+    return ret;
+}
+
 void iterate(){
+
+    //init p_i,j: represent the best position that bird i has ever been
+    p = new double *[Num_b];
+    for(int i = 0; i < Num_b; i++){
+        p[i] = new double[Dim];
+    }
+
+    for(int i = 0; i < Num_b; i++){
+        for(int j = 0; j < Dim; j++){
+            p[i][j] = x[i][j];
+        }
+    }
+
+    p_best_loss = new double[Num_b];
+    for(int i = 0; i < Num_b; i++){
+        p_best_loss[i] = loss(p[i]);
+    }
+
+    g = new double[Dim];
+
+    //find the smallest cost in p and copy to g
+    int min_index = 0;
+    double min_value = p_best_loss[0];
+    for(int i = 0; i < Num_b; i++){
+        if(p_best_loss[i] < min_value){
+            min_index = i;
+            min_value = p_best_loss[i];
+        }
+    }
+
+    for(int i = 0; i < Dim; i++){
+        g[i] = p[min_index][i];
+    }
+    g_best_loss = min_value;
+
     w = new double[Max_cycle];
     for(int cycle = 0; cycle < Max_cycle; cycle++){
         w[cycle] = w_max - (w_max - w_min) * cycle / Max_cycle;
     }
 
     for(int cycle = 0; cycle < Max_cycle; cycle++){
-        //update v
         for(int i = 0; i < Num_b; i++){
             for(int j = 0; j < Dim; j++){
-                v[i][j] = v[i][j] * w[cycle] + C1 * ...
+                v[i][j] = v[i][j] * w[cycle] + C1 * (p[i][j] - x[i][j]) * R1[cycle][i][j] + C2 * (g[j] - x[i][j]) * R2[cycle][i][j];
+                if(v[i][j] > Vmax[j]) v[i][j] = Vmax[j];
+                if(v[i][j] < -Vmax[j]) v[i][j] = -Vmax[j];
+
+                x[i][j] = x[i][j] + v[i][j];
+                if(x[i][j] > Max_boundary[j]) x[i][j] = Max_boundary[j];
+                if(x[i][j] < Min_boundary[j]) x[i][j] = Min_boundary[j];
             }
         }
-    }
+        //update pi
+        for(int i = 0; i < Num_b; i++){
+            if(loss(x[i]) < p_best_loss[i]){
+                for(int j = 0; j < Dim; j++){
+                    p[i][j] = x[i][j];
+                }
+                p_best_loss[i] = loss(x[i]);
 
+                if(p_best_loss[i] < g_best_loss){
+                    for(int j = 0; j < Dim; j++){
+                        g[j] = p[i][j];
+                    }
+                    g_best_loss = p_best_loss[i];
+                }
+            }
+        }
+
+        for(int i = 0; i < Dim; i++){
+            cout << g[i] << " ";
+        }
+        cout << loss(g) << endl;
+    }
 }
 
 int main(int argc, char *argv[]){
@@ -185,5 +242,12 @@ int main(int argc, char *argv[]){
     readR1(argv[3]);
     readR2(argv[4]);
     iterate();
+
+    g[0] = -2.67489;
+    g[1] = -8.48053;
+    g[2] = 2.9424;
+
+    cout << loss(g) << endl;
+
     return 0;
 }
