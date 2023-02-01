@@ -1,9 +1,6 @@
 #include<bits/stdc++.h>
 
 #define BUFFER_SIZE 20
-#define k 0.5
-#define w_max 1.15
-#define w_min 0.85
 
 using namespace std;
 
@@ -11,6 +8,10 @@ typedef struct _point{
     int x;
     double y;
 }point;
+
+double k = 0.5;
+double w_max = 1.15;
+double w_min = 0.85;
 
 //variable for set file
 int Dim, Num_b, Max_cycle, *Min_boundary, *Max_boundary;
@@ -72,6 +73,7 @@ void readData(char *filename){
     for(int i = 0; i < N; i++){
         fscanf(data, "%d %lf", &points[i].x, &points[i].y);
     }
+    fclose(data);
 }
 
 void initialization(){
@@ -141,7 +143,9 @@ void readR2(char *filename){
     fclose(rand);
 }
 
-double R(double *p, int x){
+
+
+double R(double *p, double x){
     double ret = 0;
     for(int i = 0; i < Dim; i++){
         ret += p[i] * pow(x, i);
@@ -152,7 +156,7 @@ double R(double *p, int x){
 double loss(double *p){
     double ret = 0;
     for(int i = 0; i < N; i++){
-        ret += abs(points[i].y - R(p, points[i].x));
+        ret += abs(points[i].y - R(p, double(points[i].x)));
     }
     return ret;
 }
@@ -197,17 +201,17 @@ void iterate(){
     for(int cycle = 0; cycle < Max_cycle; cycle++){
         w[cycle] = w_max - (w_max - w_min) * cycle / Max_cycle;
     }
-
+    
     for(int cycle = 0; cycle < Max_cycle; cycle++){
         for(int i = 0; i < Num_b; i++){
             for(int j = 0; j < Dim; j++){
                 v[i][j] = v[i][j] * w[cycle] + C1 * (p[i][j] - x[i][j]) * R1[cycle][i][j] + C2 * (g[j] - x[i][j]) * R2[cycle][i][j];
                 if(v[i][j] > Vmax[j]) v[i][j] = Vmax[j];
-                if(v[i][j] < -Vmax[j]) v[i][j] = -Vmax[j];
+                else if(v[i][j] < -Vmax[j]) v[i][j] = -Vmax[j];
 
                 x[i][j] = x[i][j] + v[i][j];
                 if(x[i][j] > Max_boundary[j]) x[i][j] = Max_boundary[j];
-                if(x[i][j] < Min_boundary[j]) x[i][j] = Min_boundary[j];
+                else if(x[i][j] < Min_boundary[j]) x[i][j] = Min_boundary[j];
             }
         }
         //update pi
@@ -226,11 +230,11 @@ void iterate(){
                 }
             }
         }
-
+        cout << cycle << " : ";
         for(int i = 0; i < Dim; i++){
             cout << g[i] << " ";
         }
-        cout << loss(g) << endl;
+        cout << loss(g) <<  endl;
     }
 }
 
