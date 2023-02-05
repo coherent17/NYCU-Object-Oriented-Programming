@@ -144,7 +144,7 @@ void readR2(char *filename){
 }
 
 
-
+//calculate the R(x) in given x point with the coeffieient pi
 double R(double *p, double x){
     double ret = 0;
     for(int i = 0; i < Dim; i++){
@@ -153,6 +153,7 @@ double R(double *p, double x){
     return ret;
 }
 
+//calculate the loss of the given coefficient pi loss=sum(1~N) |y-R(x)|
 double loss(double *p){
     double ret = 0;
     for(int i = 0; i < N; i++){
@@ -213,9 +214,6 @@ void iterate(){
                 if(x[i][j] > Max_boundary[j]) x[i][j] = Max_boundary[j];
                 else if(x[i][j] < Min_boundary[j]) x[i][j] = Min_boundary[j];
             }
-        }
-        //update pi
-        for(int i = 0; i < Num_b; i++){
             if(loss(x[i]) < p_best_loss[i]){
                 for(int j = 0; j < Dim; j++){
                     p[i][j] = x[i][j];
@@ -230,11 +228,6 @@ void iterate(){
                 }
             }
         }
-        cout << cycle << " : ";
-        for(int i = 0; i < Dim; i++){
-            cout << g[i] << " ";
-        }
-        cout << loss(g) <<  endl;
     }
 }
 
@@ -247,11 +240,8 @@ int main(int argc, char *argv[]){
     readR2(argv[4]);
     iterate();
 
-    g[0] = -2.67489;
-    g[1] = -8.48053;
-    g[2] = 2.9424;
-
-    cout << loss(g) << endl;
-
+    for(int i = 0; i < Dim; i++){
+        cout << g[i] << endl;
+    }
     return 0;
 }
