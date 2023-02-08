@@ -9,12 +9,15 @@ all: $(BIN)
 p5: p5.cpp
 	$(CC) $(CXXFLAGS) $< -o $@
 
-do:
+do1:
 	./p5 testcase/1.txt
 
-check:
-	$(CHECKCC) $(CHECKFLAGS) ./p5 testcase/1.txt
+do2:
+	./p5 testcase/2.txt
 
+
+check:
+	$(CHECKCC) $(CHECKFLAGS) ./p5 testcase/2.txt
 
 clean:
 	rm p5

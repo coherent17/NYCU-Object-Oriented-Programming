@@ -182,6 +182,7 @@ student_node *findPeople(string name, mood_node *List, int *index){
 }
 
 void removeStudentNode(mood_node **&head_addr, student_node *node_to_remove, int mood_point){
+
     student_node *head = head_addr[mood_point + 2]->head;
     if(head == node_to_remove){
         head_addr[mood_point + 2]->head = head_addr[mood_point + 2]->head->next;
@@ -218,25 +219,31 @@ void firstChange(host hostInfo, mood_node *&List, mood_node **&head_addr){
     }
 }
 
-void secondChange(gift_node *gifts, mood_node **&head_addr, int student_num, mood_node *&List){
-    while(head_addr[2]->head){
-        //find the gift for the rest in mood_point = 0
-        for(int i = 0; i < student_num; i++){
-            if(gifts[i].given == true || head_addr[2]->head->give == &gifts[i]) continue;
+void secondChange(gift_node *gifts, mood_node **&head_addr, int student_num, mood_node *&List, string *name_order){
+
+    for(int i = 0; i < student_num; i++){
+        int mood_pt;
+        student_node *current = findPeople(name_order[i], List, &mood_pt);
+        if(current->get != nullptr) continue;
+
+        for(int j = 0; j < student_num; j++){
+            if(gifts[j].given == true || current->give == &gifts[j]) continue;
 
             else{
-                gifts[i].given = true;
-                head_addr[2]->head->get = &gifts[i];
-                student_node *temp = head_addr[2]->head;
-                head_addr[2]->head = head_addr[2]->head->next;
-                if(gifts[i].good){
-                    insert_In_Alphabet_Order(head_addr, temp, 1);
+                gifts[j].given = true;
+                current->get = &gifts[j];
+                removeStudentNode(head_addr, current, 0);
+
+                if(gifts[j].good){
+                    insert_In_Alphabet_Order(head_addr, current, 1);
                 }
                 else{
-                    insert_In_Alphabet_Order(head_addr, temp, -1);
+                    insert_In_Alphabet_Order(head_addr, current, -1);
                 }
+                break;
             }
         }
+
     }
 }
 
@@ -295,7 +302,7 @@ int main(int argc, char *argv[]){
     firstChange(hostInfo, List, head_addr);
     printList(List);
 
-    secondChange(gifts, head_addr, student_num, List);
+    secondChange(gifts, head_addr, student_num, List, name_order);
     printList(List);
 
     output_mood(name_order, List, student_num);

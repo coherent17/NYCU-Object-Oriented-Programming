@@ -1,0 +1,7 @@
+5
+A E gA 1
+B D gB 0
+C B gC 1
+D C gD 0
+E A gE 0
+C D B
