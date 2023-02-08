@@ -303,7 +303,7 @@ void outputAnswer(char *filename, int **partial_image_placement, vector<partial_
                     fprintf(output, "%c", img[partial_image_placement[i][k]].msg.c_str()[j * partial_img_size + l]);
                 }
             }
-            fprintf(output, "\n");
+            if(i != row - 1 || j != partial_img_size - 1) fprintf(output, "\n");
         }
     }
     fclose(output);
@@ -326,5 +326,7 @@ int main(int argc, char *argv[]){
     int **partial_image_placement = getPartialImagePlacement(img, left_top_partial_img_idx, row, col);
     outputAnswer(argv[2], partial_image_placement, img, row, col);
     free_partial_image_placement(partial_image_placement, row);
+
+    cout << row << " " << col << endl;
     return 0;
 }
