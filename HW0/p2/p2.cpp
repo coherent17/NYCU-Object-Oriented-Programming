@@ -231,6 +231,44 @@ void iterate(){
     }
 }
 
+void outputAnswer(){
+    for(int i = 0; i < Dim; i++){
+        cout << g[i] << endl;
+    }
+}
+
+void freeMemory(){
+    delete [] Min_boundary;
+    delete [] Max_boundary;
+    delete [] points;
+
+    for(int i = 0; i < Num_b; i++){
+        delete [] x[i];
+        delete [] v[i];
+        delete [] p[i];
+    }
+    delete []x;
+    delete []v;
+    delete []p;
+
+    delete [] Vmax;
+
+    for(int i = 0; i < Max_cycle; i++){
+        for(int j = 0; j < Num_b; j++){
+            delete [] R1[i][j];
+            delete [] R2[i][j];
+        }
+        delete [] R1[i];
+        delete [] R2[i];
+    }
+    delete [] R1;
+    delete [] R2;
+
+    delete [] w;
+    delete [] p_best_loss;
+    delete [] g;
+}
+
 int main(int argc, char *argv[]){
     readSet(argv[1]);
     readData(argv[2]);
@@ -239,9 +277,7 @@ int main(int argc, char *argv[]){
     readR1(argv[3]);
     readR2(argv[4]);
     iterate();
-
-    for(int i = 0; i < Dim; i++){
-        cout << g[i] << endl;
-    }
+    outputAnswer();
+    freeMemory();
     return 0;
 }
