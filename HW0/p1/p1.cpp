@@ -326,7 +326,5 @@ int main(int argc, char *argv[]){
     int **partial_image_placement = getPartialImagePlacement(img, left_top_partial_img_idx, row, col);
     outputAnswer(argv[2], partial_image_placement, img, row, col);
     free_partial_image_placement(partial_image_placement, row);
-
-    cout << row << " " << col << endl;
     return 0;
 }
