@@ -154,7 +154,6 @@ void outputAnswer(FILE *output, match *matches){
             fprintf(output, "\tThe winner is %s\n", matches[i].teams[1].c_str());
         }
     }
-    fprintf(output, "=\n");
 }
 
 void KnockoutStage(FILE *input, match *&matches, group *groups, FILE *output){
@@ -180,9 +179,12 @@ void KnockoutStage(FILE *input, match *&matches, group *groups, FILE *output){
 
     //read the drawing case into the matches
     char buffer[BUFFER_SIZE];
-    
-    while(fscanf(input, "%[^\n]", buffer) != EOF){
-        fgetc(input);
+
+    fscanf(input, "%[^\n]", buffer);
+    fgetc(input);
+
+    while(1){
+
         int draw_straw_result[NUM_MATCH] = {0};
         int index = 0;
         char *token = strtok(buffer, " ");
@@ -256,6 +258,9 @@ void KnockoutStage(FILE *input, match *&matches, group *groups, FILE *output){
 
         outputAnswer(output, matches);
 
+        if(fscanf(input, "%[^\n]", buffer) == EOF) break;
+        fgetc(input);
+        fprintf(output, "=\n");
     }
 }
 
