@@ -127,7 +127,7 @@ void Dijkstra(vector <cell> cells, vector <int> &distance, vector <int> &parent,
         for(size_t i = 0; i < currNeighbors.size(); i++){
             unsigned long long int new_cost = distance[curr] + cells[currNeighbors[i]].cost;
             unsigned long long int old_cost = distance[currNeighbors[i]];
-            if(new_cost < old_cost){
+            if(new_cost <= old_cost){
                 distance[currNeighbors[i]] = distance[curr] + cells[currNeighbors[i]].cost;
                 parent[currNeighbors[i]] = curr;
             }
