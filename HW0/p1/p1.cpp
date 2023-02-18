@@ -303,7 +303,7 @@ void outputAnswer(char *filename, int **partial_image_placement, vector<partial_
                     fprintf(output, "%c", img[partial_image_placement[i][k]].msg.c_str()[j * partial_img_size + l]);
                 }
             }
-            if(i != row - 1 || j != partial_img_size - 1) fprintf(output, "\n");
+            fprintf(output, "\n");
         }
     }
     fclose(output);
