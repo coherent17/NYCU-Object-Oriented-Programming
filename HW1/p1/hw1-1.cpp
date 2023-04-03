@@ -4,7 +4,9 @@ using namespace std;
 
 //if num1 < num2 return 0, else return 1
 int compareInt(void* num1, void* num2){
-    return (*(int *)num1 < *(int *)num2) ? 0 : 1;
+    if(*(int *)num1 < *(int *)num2) return 0;
+    else if(*(int *)num1 > *(int *)num2) return 1;
+    return 2;
 }
 
 void printBST(void* num1){
@@ -47,6 +49,9 @@ int main(){
                 cout << "Enter the integer: "; cin >> *delptr;
                 if(myBST.BST_Delete((void *)delptr)){
                     myBST.BST_Traverse(printBST);
+                }
+                else{
+                    cout << "The number is not in BST." << endl;
                 }
                 break;
             }

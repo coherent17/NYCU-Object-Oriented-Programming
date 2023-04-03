@@ -11,8 +11,7 @@ void BST::freeBST(node *root){
     if(root == nullptr) return;
     freeBST(root->left);
     freeBST(root->right);
-    int *temp = (int *)root->dataPtr;
-    delete temp;
+    delete (int *)root->dataPtr;
     delete root;
 }
 
@@ -51,9 +50,19 @@ bool BST::BST_Insert(void* dataPtr){
     return true;
 }
 
+node *BST::minValueNode(node *n){
+    node *temp = n;
+    while(temp && temp->left != nullptr){
+        temp = temp->left;
+    }
+    return temp;
+}
+
 node *BST::remove(node *r, void *dltKey, bool *found){
-    node *temp = nullptr;
-    if(r == nullptr) return nullptr;
+
+    if(r == nullptr){
+        return r;
+    }
 
     if(compare(dltKey, r->dataPtr) == 0){
         r->left = remove(r->left, dltKey, found);
@@ -61,28 +70,25 @@ node *BST::remove(node *r, void *dltKey, bool *found){
     else if(compare(dltKey, r->dataPtr) == 1){
         r->right = remove(r->right, dltKey, found);
     }
-    //found it!
 
-    //if the deleted node has 2 child
-    else if(r->left && r->right){
-        *found = true;
-        while(temp->left != nullptr){
-            temp = temp->left;
-        }
-        r->dataPtr = temp->dataPtr;
-        r->right = remove(r->right, r->dataPtr, found);
-    }
-    //only has 1 child or no child
     else{
         *found = true;
-        temp = r;
-        if(r->left == nullptr)
-            r = r->right;
-        else if(r->right == nullptr)
-            r = r->left;
-        int *garbage = (int *)temp->dataPtr;
-        delete garbage;
-        delete temp;
+        if(r->left == nullptr){
+            node *temp = r->right;
+            delete (int *)r->dataPtr;
+            delete r;
+            return temp;
+        }
+        else if(r->right == nullptr){
+            node *temp = r->left;
+            delete (int *)r->dataPtr;
+            delete r;
+            return temp;
+        }
+
+        node *temp = minValueNode(r->right);
+        r->dataPtr = temp->dataPtr;
+        r->right = remove(r->right, temp->dataPtr, found);
     }
     return r;
 }
@@ -90,15 +96,11 @@ node *BST::remove(node *r, void *dltKey, bool *found){
 bool BST::BST_Delete(void* dltKey){
     bool found = false;
     root = remove(root, dltKey, &found);
-    if(!found){
-        cout << "The number is not in BST." << endl;
-        return false;
-    }
-    else{
+    if(found){
         count--;
-        cout << "New BST: ";
         return true;
     }
+    return false;
 }
 
 void BST::inorderTraversal(node *r){
@@ -110,7 +112,7 @@ void BST::inorderTraversal(node *r){
 
 void BST::BST_Traverse(void (*process) (void* dataPtr)){
     if(BST_Empty()){
-        cout << "The BST is empty" << endl;
+        cout << "The BST is empty." << endl;
         return;
     }
     inorderTraversal(root);

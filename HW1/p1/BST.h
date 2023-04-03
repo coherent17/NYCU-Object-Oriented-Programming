@@ -33,6 +33,7 @@ class BST{
         node *createNode(void *dataPtr);                        //helper function to dynamic allocate memory for node
         void inorderTraversal(node *root);                      //perform inorder traversal in BST
         node *remove(node *root, void *dltKey, bool *found);    //helper function in BST_Delete
+        node *minValueNode(node *n);
 
 };
 #endif

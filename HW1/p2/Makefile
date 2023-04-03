@@ -1,7 +1,7 @@
 CC = g++
 CFLAGS = -g -Wall
-OBJS = BST.o
-BINS = hw1-1
+OBJS = stock.o
+BINS = hw1-2
 
 CHECKCC = valgrind
 CHECKFLAGS = --leak-check=full -s --show-leak-kinds=all --track-origins=yes
@@ -11,7 +11,7 @@ all: $(BINS)
 %.o: %.cpp %.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(BINS): hw1-1.cpp $(OBJS)
+$(BINS): hw1-2.cpp $(OBJS)
 	$(CC) $(CFLAGS) $^ -o $@
 
 
