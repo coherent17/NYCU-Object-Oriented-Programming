@@ -48,11 +48,13 @@ int main(){
                 int *delptr = new int;
                 cout << "Enter the integer: "; cin >> *delptr;
                 if(myBST.BST_Delete((void *)delptr)){
+                    cout << "New BST: ";
                     myBST.BST_Traverse(printBST);
                 }
                 else{
                     cout << "The number is not in BST." << endl;
                 }
+                delete delptr;
                 break;
             }
 
