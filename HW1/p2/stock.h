@@ -12,14 +12,13 @@ class Stock{
         static bool trade_available;
         int ticket_num;
         double avg_buy_price;
-        //double total;
         const string owner_name;
 
     public:
         Stock();
         Stock(string name);
         Stock(string name, int n1);
-        //Stock(string name, double total1);
+
         void operator + (const Stock &);
         void operator - (const Stock &);
         void buy();
