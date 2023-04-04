@@ -3,7 +3,7 @@
 #include <vector>
 #include <cstdlib>
 #include <time.h>
-#include "stock.h"
+#include "Stock.h"
 
 using namespace std;
 
@@ -26,8 +26,6 @@ int main(){
         if(!first){
             Stock::refresh_current_price();
             Stock::check_trade_is_available();
-            // cout << "-----------------------------------------------" << endl;
-            // Stock::show_current_price();
         }
         else{
             Stock::show_current_price();

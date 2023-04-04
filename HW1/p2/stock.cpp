@@ -1,4 +1,4 @@
-#include "stock.h"
+#include "Stock.h"
 #include <iostream>
 #include <cmath>
 
@@ -66,16 +66,18 @@ string Stock::get_owner_name() const{
 }
 
 void Stock::show_current_price(){
+    cout << "-----------------------------------------------" << endl;
     cout << "current price of the stock: " << cur_price << endl;
 }
 
 void Stock::check_trade_is_available(){
-    if(fabs(cur_price - init_price) / init_price > limit_ratio){
+    if(fabs(cur_price - init_price) / init_price > limit_ratio && trade_available == true){
         trade_available = false;
     }
-    else trade_available = true;
+    if(trade_available == false) cout << "trade is not available anymore" << endl;
 }
 
 void Stock::refresh_current_price(){
     cur_price = cur_price + static_cast<double>(rand() % 500) / 100 - 2.5;
+    show_current_price();
 }

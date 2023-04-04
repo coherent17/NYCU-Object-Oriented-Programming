@@ -64,13 +64,17 @@ node *BST::remove(node *r, void *dltKey, bool *found){
         return r;
     }
 
+    //if the deleted key is smaller than current node, go left
     if(compare(dltKey, r->dataPtr) == 0){
         r->left = remove(r->left, dltKey, found);
     }
+
+    //if the deleted key is larger than the current node, go right
     else if(compare(dltKey, r->dataPtr) == 1){
         r->right = remove(r->right, dltKey, found);
     }
 
+    //found the delete node
     else{
         *found = true;
         if(r->left == nullptr){
@@ -86,6 +90,7 @@ node *BST::remove(node *r, void *dltKey, bool *found){
             return temp;
         }
 
+        //the node to delete has 2 children
         node *temp = minValueNode(r->right);
         r->dataPtr = temp->dataPtr;
         r->right = remove(r->right, temp->dataPtr, found);

@@ -1,6 +1,6 @@
 CC = g++
 CFLAGS = -g -Wall
-OBJS = stock.o
+OBJS = Stock.o
 BINS = hw1-2
 
 CHECKCC = valgrind
