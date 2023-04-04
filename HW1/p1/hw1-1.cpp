@@ -48,7 +48,8 @@ int main(){
                 int *delptr = new int;
                 cout << "Enter the integer: "; cin >> *delptr;
                 if(myBST.BST_Delete((void *)delptr)){
-                    cout << "New BST: ";
+                    if(myBST.BST_Count() != 0)
+                        cout << "New BST: ";
                     myBST.BST_Traverse(printBST);
                 }
                 else{
