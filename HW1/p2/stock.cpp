@@ -31,6 +31,13 @@ void Stock::operator +(const Stock &s){
 }
 
 void Stock::operator -(const Stock &s){
+
+    if(ticket_num - s.ticket_num == 0){
+        avg_buy_price = 0;
+        ticket_num = 0;
+        return;
+    }
+
     avg_buy_price = (avg_buy_price * ticket_num - s.avg_buy_price * s.ticket_num) / (ticket_num - s.ticket_num);
     ticket_num -= s.ticket_num;
 }
@@ -51,6 +58,9 @@ void Stock::sell(){
 
         if(x <= ticket_num){
             (*this) - Stock(owner_name, x);
+        }
+        else{
+            cout << "you don't have enough stock ticket" << endl;
         }
     }
     else cout << "The trade is not available today." << endl;
