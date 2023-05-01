@@ -1,0 +1,14 @@
+ID,Name,Email,Password,Position,Degree,Tuition,Salary
+111511000,Alex,111511000@nycu.edu.tw,1234,Student,bachelor,40000,
+111511001,Zack,111511001@nycu.edu.tw,1234,Student,bachelor,40000,
+111511002,Jhonny,111511002@nycu.edu.tw,1234,Student,bachelor,40000,
+111511003,Bob,111511003@nycu.edu.tw,1234,Student,bachelor,40000,
+111511004,Jessica,111511004@nycu.edu.tw,1234,Student,bachelor,40000,
+311511000,Samuel,311511000@nycu.edu.tw,tasamuel,TA,Master,30000,24000
+311511001,Amy,311511001@nycu.edu.tw,taamy,TA,Master,30000,24000
+311511002,Nicholas,311511002@nycu.edu.tw,tanicholas,TA,PHD,30000,40000
+311511003,Brian,311511003@nycu.edu.tw,tabrian,TA,Master,30000,24000
+311511004,Jimmy,311511004@nycu.edu.tw,tajimmy,TA,Master,30000,24000
+311511005,Lowry,311511005@nycu.edu.tw,talowry,TA,PHD,30000,40000
+opwen,Wen Hung-Pin,opwen@nycu.edu.tw,opwen,Teacher,,,2000000
+tingyoyo,Lin Ting-Yu,tingyoyo@nctu.edu.tw,tingyoyo,Teacher,,,2000000
