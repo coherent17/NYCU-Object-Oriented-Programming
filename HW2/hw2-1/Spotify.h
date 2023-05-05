@@ -1,7 +1,8 @@
 #ifndef SPOTIFY_H
 #define SPOTIFY_H
 #include <fstream>
-
+#include <vector>
+#include <algorithm>
 #include "User.h"
 
 using namespace std;
@@ -21,15 +22,13 @@ class Spotify {
         void createUser();     // create new user
         void logIN();          // log in to specific user
         void logOUT();         // log out from current user
-        void printSongList();  // list all songs in device  (sort by song length)
-        void printUserList();  // list all users in device
+        void printSongList();  // list all songs in device (sort by song length, if equal sort by song title)
+        void printUserList();  // list all users in device (sort by creation order)
 
     public:
         Spotify(string file);
         ~Spotify();
         void controlManual();  // controller of the whole device
-        friend class User;
-        // Add any Accessor & Mutator functions, or friend class declaration you need
 };
 
 #endif

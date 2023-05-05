@@ -1,11 +1,6 @@
 #include "Playlist.h"
-#include "Song.h"
-#include <vector>
-#include <algorithm>
-#include <iostream>
-#include <iomanip>
-Playlist::Playlist(string name, const vector<const Song *> &songs): songs(songs){
-    this->name = name;
+
+Playlist::Playlist(string name, const vector<const Song *> &songs):name(name), songs(songs){
     curr_song_index = 0;
 }
 
@@ -13,10 +8,7 @@ Playlist::~Playlist(){
 
 }
 
-string Playlist::get_name()const{
-    return name;
-}
-
+// show song in playlist (sort by song length, if equal sort by song title)
 void Playlist::show_song(){
     cout << "|| SONG IN LIST ||" << endl;
     for(size_t i = 0; i < song_in_list.size(); i++){
@@ -24,6 +16,7 @@ void Playlist::show_song(){
     }
 }
 
+// add song into playlist (song must exists in streaming device)
 void Playlist::add_song(){
     cout << "ADD SONG" << endl;
     string name;
@@ -37,12 +30,14 @@ void Playlist::add_song(){
         }
     }
     cout << "Doesn't find the song." << endl;
-}
+}   
 
+// remove song from playlist
 void Playlist::remove_song(){
     cout << "REMOVE SONG" << endl;
     string name;
     cout << "Song Name: "; cin >> name;
+
     for(size_t i = 0; i < song_in_list.size(); i++){
         if(song_in_list[i]->get_name() == name){
             song_in_list.erase(song_in_list.begin() + i);
@@ -52,22 +47,25 @@ void Playlist::remove_song(){
     cout << "Doesn't find the song." << endl;
 }
 
+// play current song
 void Playlist::play_song(){
     cout << "//// SONG INFO ////" << endl;
     cout << "Name: " << song_in_list[curr_song_index]->get_name() << endl;
     cout << "Artist: " << song_in_list[curr_song_index]->get_artist() << endl;
     cout << "Length: " << song_in_list[curr_song_index]->get_song_len() << endl;
     cout << "//// SONG INFO ////" << endl;
-}
+} 
 
+// play next song (back to first song if meet the end of playlist)
 void Playlist::next_song(){
     curr_song_index = (curr_song_index + 1) % song_in_list.size();
 }
 
+// play previous song (go to last song if meet the start of playlist)
 void Playlist::prev_song(){
     curr_song_index = (curr_song_index + song_in_list.size() - 1) % song_in_list.size();
 }
 
-size_t Playlist::get_song_in_list_size()const{
-    return song_in_list.size();
+bool list_cmp(const Playlist *p1, const Playlist *p2){
+    return p1->name < p2->name;
 }

@@ -1,0 +1,37 @@
+#ifndef _ROLE_H_
+#define _ROLE_H_
+
+#include <iostream>
+#include <string>
+using namespace std;
+
+class Role{
+    private:
+        int hp;
+        int attack;
+        int defense;
+        int speed;
+        bool isDenfense;
+
+    public:
+        Role();
+        Role(int _hp, int _attack, int _defense, int _speed, bool _isDenfense);
+        ~Role();
+
+        int get_hp()const;
+        int get_attack()const;
+        int get_defense()const;
+        int get_speed()const;
+        bool get_isDenfense()const;
+
+        virtual void printInfo(ostream& out)const;
+        virtual string get_DEFAULT_ICON1();
+        virtual string get_DEFAULT_ICON2();
+        virtual string get_ATTACK_ICON1();
+        virtual string get_ATTACK_ICON2();
+        virtual string get_DEFENSE_ICON1();
+        virtual string get_DEFENSE_ICON2();
+        friend ostream& operator<<(ostream& out, const Role& R);
+};
+
+#endif

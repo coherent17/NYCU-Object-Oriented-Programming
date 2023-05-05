@@ -1,17 +1,10 @@
 #include "Spotify.h"
-#include "Song.h"
-#include <iostream>
-#include <iomanip>
-#include <sstream>
-#include <algorithm>
-Spotify::Spotify(string file){
 
+Spotify::Spotify(string file){
     curr_user = nullptr;
 
     ifstream fin(file);
-    string name;
-    string artist;
-    string song_len;
+    string name, artist, song_len;
 
     while(getline(fin, name)){
         getline(fin, artist);
@@ -24,23 +17,34 @@ Spotify::Spotify(string file){
 }
 
 Spotify::~Spotify(){
-
+    for(size_t i = 0; i < songs.size(); i++){
+        delete songs[i];
+    }
+    for(size_t i = 0; i < users.size(); i++){
+        delete users[i];
+    }
+    curr_user = nullptr;
 }
 
+// controller of the whole device
 void Spotify::controlManual(){
     while(1){
         scene1();
         string choice;
         cout << ">> "; cin >> choice;
-        if(choice == "s") printSongList();
-        else if(choice == "a") addSong();
-        else if(choice == "c") createUser();
-        else if(choice == "U") printUserList();
-        else if(choice == "i") logIN();
+        if(choice == "s" || choice == "S") printSongList();
+        else if(choice == "a" || choice == "A") addSong();
+        else if(choice == "c" || choice == "C") createUser();
+        else if(choice == "u" || choice == "U") printUserList();
+        else if(choice == "i" || choice == "I") logIN();
+        else if(choice == "q" || choice == "Q") break;
+        else cout << "Input Error!!!" << endl;
     }
-    
-}
+} 
 
+
+
+// add new song into songs
 void Spotify::addSong(){
     cout << "ADD SONG" << endl;
     string name;
@@ -52,8 +56,9 @@ void Spotify::addSong(){
     const Song* s = new Song(name, artist, song_len);
     songs.push_back(s);
     sort(songs.begin(), songs.end(), song_cmp);
-}
+}   
 
+// create new user
 void Spotify::createUser(){
     cout << "CREATE USER" << endl;
     string name;
@@ -69,12 +74,12 @@ void Spotify::createUser(){
 
     User *u = new User(name, passwd, songs);
     users.push_back(u);
-}
+}   
 
+// log in to specific user
 void Spotify::logIN(){
     cout << "LOG IN" << endl;
-    string name;
-    string passwd;
+    string name, passwd;
     cout << "User Name: "; cin >> name;
     cout << "User Passwd: "; cin >> passwd;
 
@@ -107,7 +112,7 @@ void Spotify::logIN(){
         curr_user->show_list();
         string choice;
         cout << ">> "; cin >> choice;
-        if(choice == "c"){
+        if(choice == "c" || choice == "C"){
             curr_user->choose_list();
 
             if(curr_user->curr_list){
@@ -117,9 +122,9 @@ void Spotify::logIN(){
                     string playlist_choice;
                     cout << ">> "; cin >> playlist_choice;
                     if(playlist_choice == "a" || playlist_choice == "A") curr_user->curr_list->add_song();
-                    else if(playlist_choice == "r") curr_user->curr_list->remove_song();
-                    else if(playlist_choice == "p"){
-                        if(curr_user->curr_list->get_song_in_list_size() == 0){
+                    else if(playlist_choice == "r" || playlist_choice == "R") curr_user->curr_list->remove_song();
+                    else if(playlist_choice == "p" || playlist_choice == "P"){
+                        if(curr_user->curr_list->song_in_list.size() == 0){
                             cout << "The list is empty." << endl;
                             continue;
                         }
@@ -128,36 +133,35 @@ void Spotify::logIN(){
                             curr_user->curr_list->play_song();
                             string music_choice;
                             cout << ">> "; cin >> music_choice;
-                            if(music_choice == "n"){
-                                curr_user->curr_list->next_song();
-                            } 
-                            else if(music_choice == "p"){
-                                curr_user->curr_list->prev_song();
-                            } 
-                            else if(music_choice == "b") break;
+                            if(music_choice == "n" || music_choice == "N") curr_user->curr_list->next_song();
+                            else if(music_choice == "p" || music_choice == "P") curr_user->curr_list->prev_song();
+                            else if(music_choice == "b" || music_choice == "B") break;
                         }
                     } 
-                    else if(playlist_choice == "b") break;
+                    else if(playlist_choice == "b" || playlist_choice == "B") break;
                 }
             }
-            else{
-                cout << "List doesn't exist" << endl;
-            }
         } 
-        else if(choice == "a") curr_user->add_list();
-        else if(choice == "o"){
-            string logOUT_choice;
-            logOUT(); cin >> logOUT_choice;
-            if(logOUT_choice == "n") continue;
-            if(logOUT_choice == "y") break;
+        else if(choice == "a" || choice == "A") curr_user->add_list();
+        else if(choice == "o" || choice == "O"){
+            logOUT(); 
+            if(curr_user == nullptr) break;
         }
     }
-}
+}   
 
+// log out from current user
 void Spotify::logOUT(){
-    cout << "Are You SUre to Log Out? (y/n) ";
-}
+    string logOUT_choice;
+    cout << "Are You Sure to Log Out? (y/n) "; cin >> logOUT_choice;
+    if(logOUT_choice == "n" || logOUT_choice == "N") return;
+    else if(logOUT_choice == "y" || logOUT_choice == "Y"){
+        cout << "Log Out Sucessfully" << endl;
+        curr_user = nullptr;
+    }
+}   
 
+// list all songs in device (sort by song length, if equal sort by song title)
 void Spotify::printSongList(){
     cout << "12345678901234567890123456789012345" << endl;
     for(size_t i = 0; i < songs.size(); i++){
@@ -165,6 +169,7 @@ void Spotify::printSongList(){
     }
 }
 
+// list all users in device (sort by creation order)
 void Spotify::printUserList(){
     for(size_t i = 0; i < users.size(); i++){
         cout << users[i]->get_name() << "\t";
@@ -182,9 +187,9 @@ void Spotify::scene1() {
     cout << ":::::::::::::::::::::::::::::'##::: ##: ##:::::::: ##:::: ##:::: ##::::: ##:: ##:::::::::: ##::::::::::::::::::::::::::::::" << endl;
     cout << ":::::::::::::::::::::::::::::. ######:: ##::::::::. #######::::: ##::::'####: ##:::::::::: ##::::::::::::::::::::::::::::::" << endl;
     cout << "::::::::::::::::::::::::::::::......:::..::::::::::.......::::::..:::::....::..:::::::::::..:::::::::::::::::::::::::::::::" << endl;
-    cout << "               __   __                                                                                                     " << endl;
-    cout << "   | .   |    /  \\ / _`       | |\\ |                                                                                       " << endl;
-    cout << "   | .   |___ \\__/ \\__>       | | \\|                                                                                       " << endl;
+    cout << "               __   __                                         __       __         ___                              " << endl;
+    cout << "   | .   |    /  \\ / _`    | |\\ |                             /  \\ .   /  \\ |  | |  |                               " << endl;
+    cout << "   | .   |___ \\__/ \\__>    | | \\|                             \\__X .   \\__X \\__/ |  |                               " << endl;
     cout << "                                                                                                                           " << endl;
     cout << "               __   __      __   __        __                  __       __   __   ___      ___  ___          __   ___  __  " << endl;
     cout << " /\\  .    /\\  |  \\ |  \\    /__` /  \\ |\\ | / _`                /  ` .   /  ` |__) |__   /\\   |  |__     |  | /__` |__  |__) " << endl;
@@ -195,6 +200,7 @@ void Spotify::scene1() {
     cout << ".__/ .   |___ | .__/  |     .__/ \\__/ | \\| \\__> .__/          \\__/ .   |___ | .__/  |     \\__/ .__/ |___ |  \\ .__/         " << endl
          << endl;
 }
+
 void Spotify::scene2() {
     cout << "::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::" << endl;
     cout << "::::::::::::::::::'##::::'##::'######::'########:'########:::::'########:::::'###:::::'######:::'########:::::::::::::::::" << endl;
@@ -218,6 +224,7 @@ void Spotify::scene2() {
     cout << "\\__, .   \\__, |  | \\__/ \\__/ .__/ |___    |___ | .__/  |                                                                  " << endl
          << endl;
 }
+
 void Spotify::scene3() {
     cout << ":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::" << endl;
     cout << "::::::::::::::::::::::::'########::'##::::::::::'###::::'##:::'##:'##:::::::'####::'######::'########::::::::::::::::::::::" << endl;
@@ -245,6 +252,7 @@ void Spotify::scene3() {
     cout << "|__) .   \\__> \\__/    |__) /~~\\ \\__, |  \\                      " << endl
          << endl;
 }
+
 void Spotify::scene4() {
     cout << ":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::" << endl;
     cout << ":::::::::::::::::::'##::::'##:'##::::'##::'######::'####::'######::::'########:'####:'##::::'##:'########::::::::::::::::::" << endl;
