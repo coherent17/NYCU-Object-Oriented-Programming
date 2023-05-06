@@ -32,6 +32,14 @@ bool Role::get_isDenfense()const{
     return isDenfense;
 }
 
+void Role::set_hp(int x){
+    hp = x;
+}
+
+void Role::set_isDenfense(bool x){
+    isDenfense = x;
+}
+
 void Role::printInfo(ostream& out)const{
     out << "HP: " << hp << endl;
     out << "Attack: " << attack << endl;
@@ -45,26 +53,30 @@ ostream& operator<<(ostream& out, const Role& R){
     return out;
 }
 
-string Role::get_DEFAULT_ICON1(){
+string Role::get_DEFAULT_ICON(){
     return "";
 }
 
-string Role::get_DEFAULT_ICON2(){
+string Role::get_ATTACK_ICON(){
     return "";
 }
 
-string Role::get_ATTACK_ICON1(){
+string Role::get_DEFENSE_ICON(){
     return "";
 }
 
-string Role::get_ATTACK_ICON2(){
+string Role::get_SHORT_ATTACK_ICON(){
     return "";
 }
 
-string Role::get_DEFENSE_ICON1(){
-    return "";
+int Role::get_magicAttack(){
+    return 0;
 }
 
-string Role::get_DEFENSE_ICON2(){
-    return "";
+float Role::get_critRate(){
+    return 0;
+}
+
+float Role::get_lifeSteal(){
+    return 0;
 }

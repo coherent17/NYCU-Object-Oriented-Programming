@@ -24,13 +24,17 @@ class Role{
         int get_speed()const;
         bool get_isDenfense()const;
 
+        void set_hp(int);
+        void set_isDenfense(bool);
+
         virtual void printInfo(ostream& out)const;
-        virtual string get_DEFAULT_ICON1();
-        virtual string get_DEFAULT_ICON2();
-        virtual string get_ATTACK_ICON1();
-        virtual string get_ATTACK_ICON2();
-        virtual string get_DEFENSE_ICON1();
-        virtual string get_DEFENSE_ICON2();
+        virtual string get_DEFAULT_ICON();
+        virtual string get_ATTACK_ICON();
+        virtual string get_DEFENSE_ICON();
+        virtual string get_SHORT_ATTACK_ICON();
+        virtual int get_magicAttack();
+        virtual float get_critRate();
+        virtual float get_lifeSteal();
         friend ostream& operator<<(ostream& out, const Role& R);
 };
 
