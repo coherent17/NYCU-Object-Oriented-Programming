@@ -15,6 +15,15 @@
 #include <cstdlib>
 using namespace std;
 
+//helper function
+int max(int a, int b){
+    return a > b ? a : b;
+}
+
+int min(int a, int b){
+    return a < b ? a : b;
+}
+
 void concat(string s1, string s2, int initSpaceCount, int midSpaceCount){
     int row = 5;
     int col1 = s1.length() / row;
@@ -51,6 +60,33 @@ void concat(string s1, string s2, int initSpaceCount, int midSpaceCount){
         }
         cout << endl;
     }
+}
+
+//choice r1's choice -> 1 (Mage), 2(Warrior), 3(Vampire)
+//r1's turn, r2 is the enemy
+void Update(Role *r1, Role *r2, int choice, int *loss_hp){
+    int loss = 0;
+    int r1_attack = 0;
+
+    switch(choice){
+        case MAGE:
+            loss = r1->get_magicAttack() + ((r2->get_isDenfense() == true) ? max(r1->get_attack() - r2->get_defense(), 0) : r1->get_attack());
+            break;
+        
+        case WARRIOR:
+            r1_attack = r1->get_attack() * (((rand() % 100 < 100 * r1->get_critRate()) == true) ? 2 : 1);
+            loss = (r2->get_isDenfense() == true) ? max(r1_attack - r2->get_defense(), 0) : r1_attack;
+            break;
+        
+        case VAMPIRE:
+            loss = ((r2->get_isDenfense() == true) ? max(r1->get_attack() - r2->get_defense(), 0) : r1->get_attack());
+            break;
+        
+        default:
+            break;
+    }
+
+    *loss_hp = loss;
 }
 
 int main(){
@@ -125,55 +161,30 @@ int main(){
         int choice; cin >> choice;
 
         if(Play1){
+
+            if(p1_choice == VAMPIRE){
+                Player1->set_hp(min(VAMPIRE_HP, Player1->get_hp() + Player1->get_lifeSteal() * VAMPIRE_HP));
+                Player2->set_hp(Player2->get_hp() - (Player1->get_lifeSteal() * VAMPIRE_HP));
+                if(Player2->get_hp() <= 0){
+                    cout << "Player 2 lose" << endl;
+                    break;
+                } 
+            }
+
             if(choice == ATTACK){
-                int P2_hp_lost = 0;
-                int P1_attack = 0;
-                switch(p1_choice){
-                    case MAGE:
-                        if(Player2->get_isDenfense() == true){
-                            P2_hp_lost = Player1->get_magicAttack() + ((Player1->get_attack() > Player2->get_defense()) ? Player1->get_attack() - Player2->get_defense() : 0);
-                        }
-                        else if(Player2->get_isDenfense() == false) P2_hp_lost = Player1->get_magicAttack() + Player1->get_attack();
-                        break;
-                    
-                    case WARRIOR:
-                        P1_attack =  (rand() % 100 < 100 * Player1->get_critRate()) ? Player1->get_attack() * 2 : Player1->get_attack();
-                        if(Player2->get_isDenfense() == true){
-                            if(P1_attack > Player2->get_defense()) P2_hp_lost = P1_attack - Player2->get_defense();
-                        }
-                        else if(Player2->get_isDenfense() == false)  P2_hp_lost = P1_attack;
-                        break;
-                    
-                    case VAMPIRE:
-                        P1_attack =  Player1->get_attack() + Player1->get_lifeSteal() * VAMPIRE_HP;
-                        if(Player2->get_isDenfense() == true){
-                            if(P1_attack > Player2->get_defense()) P2_hp_lost = P1_attack - Player2->get_defense();
-                        }
-                        else if(Player2->get_isDenfense() == false)  P2_hp_lost = P1_attack;
-                        Player1->set_hp((Player1->get_lifeSteal() * VAMPIRE_HP + Player1->get_hp() > VAMPIRE_HP) ? VAMPIRE_HP : Player1->get_lifeSteal() * VAMPIRE_HP + Player1->get_hp());
-                        break;
-                    
-                    default:
-                        break;
-                }
-
-
+                int P2_loss = 0;
+                Update(Player1, Player2, p1_choice, &P2_loss);
                 if(Player2->get_isDenfense() == true){
                     concat(Player1->get_SHORT_ATTACK_ICON(), Player2->get_DEFENSE_ICON(), 10, 1);
                     Player2->set_isDenfense(false);
-
                 }
                 else{
                     concat(Player1->get_ATTACK_ICON(), Player2->get_DEFAULT_ICON(), 10, 0);
                 }
-
-                //update the Player 2 hp and check if the game end
-                if(P2_hp_lost >= Player2->get_hp()){
+                Player2->set_hp(Player2->get_hp() - P2_loss);
+                if(Player2->get_hp() <= 0){
                     cout << "Player 2 lose" << endl;
                     break;
-                }
-                else{
-                    Player2->set_hp(Player2->get_hp() - P2_hp_lost);
                 }
             }
             else if(choice == DEFENSE){
@@ -181,38 +192,17 @@ int main(){
             }
         }
         else{
+            if(p2_choice == VAMPIRE){
+                Player2->set_hp(min(VAMPIRE_HP, Player2->get_hp() + Player2->get_lifeSteal() * VAMPIRE_HP));
+                Player1->set_hp(Player1->get_hp() - (Player2->get_lifeSteal() * VAMPIRE_HP));
+                if(Player1->get_hp() <= 0){
+                    cout << "Player 1 lose" << endl;
+                    break;
+                } 
+            }
             if(choice == ATTACK){
-                int P1_hp_lost = 0;
-                int P2_attack = 0;
-                switch(p2_choice){
-                    case MAGE:
-                        if(Player1->get_isDenfense() == true){
-                            P1_hp_lost = Player2->get_magicAttack() + ((Player2->get_attack() > Player1->get_defense()) ? Player2->get_attack() - Player1->get_defense() : 0);
-                        }
-                        else if(Player1->get_isDenfense() == false) P1_hp_lost = Player2->get_magicAttack() + Player2->get_attack();
-                        break;
-                    
-                    case WARRIOR:
-                        P2_attack =  (rand() % 100 < 100 * Player2->get_critRate()) ? Player2->get_attack() * 2 : Player2->get_attack();
-                        if(Player1->get_isDenfense() == true){
-                            if(P2_attack > Player1->get_defense()) P1_hp_lost = P2_attack - Player1->get_defense();
-                        }
-                        else if(Player1->get_isDenfense() == false)  P1_hp_lost = P2_attack;
-                        break;
-                    
-                    case VAMPIRE:
-                        P2_attack =  Player2->get_attack() + Player2->get_lifeSteal() * VAMPIRE_HP;
-                        if(Player1->get_isDenfense() == true){
-                            if(P2_attack > Player1->get_defense()) P1_hp_lost = P2_attack - Player1->get_defense();
-                        }
-                        else if(Player1->get_isDenfense() == false)  P1_hp_lost = P2_attack;
-                        Player2->set_hp((Player2->get_lifeSteal() * VAMPIRE_HP + Player2->get_hp() > VAMPIRE_HP) ? VAMPIRE_HP : Player2->get_lifeSteal() * VAMPIRE_HP + Player2->get_hp());
-                        break;
-                    
-                    default:
-                        break;
-                }
-
+                int P1_loss = 0;
+                Update(Player2, Player1, p2_choice, &P1_loss);
                 if(Player1->get_isDenfense() == true){
                     concat(Player1->get_DEFENSE_ICON(), Player2->get_SHORT_ATTACK_ICON(), 6, 1);
                     Player1->set_isDenfense(false);
@@ -220,20 +210,16 @@ int main(){
                 else{
                     concat(Player1->get_DEFAULT_ICON(), Player2->get_ATTACK_ICON(), 6, 0);
                 }
-                //update the Player 1 hp and check if the game end
-                if(P1_hp_lost >= Player1->get_hp()){
+                Player1->set_hp(Player1->get_hp() - P1_loss);
+                if(Player1->get_hp() <= 0){
                     cout << "Player 1 lose" << endl;
                     break;
-                }
-                else{
-                    Player1->set_hp(Player1->get_hp() - P1_hp_lost);
                 }
             }
             else if(choice == DEFENSE){
                 Player2->set_isDenfense(true);
             }
         }
-
         Play1 = !Play1;
         Round++;
     }

@@ -53,22 +53,6 @@ ostream& operator<<(ostream& out, const Role& R){
     return out;
 }
 
-string Role::get_DEFAULT_ICON(){
-    return "";
-}
-
-string Role::get_ATTACK_ICON(){
-    return "";
-}
-
-string Role::get_DEFENSE_ICON(){
-    return "";
-}
-
-string Role::get_SHORT_ATTACK_ICON(){
-    return "";
-}
-
 int Role::get_magicAttack(){
     return 0;
 }

@@ -28,10 +28,11 @@ class Role{
         void set_isDenfense(bool);
 
         virtual void printInfo(ostream& out)const;
-        virtual string get_DEFAULT_ICON();
-        virtual string get_ATTACK_ICON();
-        virtual string get_DEFENSE_ICON();
-        virtual string get_SHORT_ATTACK_ICON();
+        // =0?
+        virtual string get_DEFAULT_ICON() = 0;
+        virtual string get_ATTACK_ICON() = 0;
+        virtual string get_DEFENSE_ICON() = 0;
+        virtual string get_SHORT_ATTACK_ICON() = 0;
         virtual int get_magicAttack();
         virtual float get_critRate();
         virtual float get_lifeSteal();

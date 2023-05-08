@@ -38,7 +38,6 @@ void Spotify::controlManual(){
         else if(choice == "u" || choice == "U") printUserList();
         else if(choice == "i" || choice == "I") logIN();
         else if(choice == "q" || choice == "Q") break;
-        else cout << "Input Error!!!" << endl;
     }
 } 
 
@@ -152,6 +151,7 @@ void Spotify::logIN(){
 
 // log out from current user
 void Spotify::logOUT(){
+    cout << "LOG OUT" << endl;
     string logOUT_choice;
     cout << "Are You Sure to Log Out? (y/n) "; cin >> logOUT_choice;
     if(logOUT_choice == "n" || logOUT_choice == "N") return;
