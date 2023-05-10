@@ -40,19 +40,6 @@ void Role::set_isDenfense(bool x){
     isDenfense = x;
 }
 
-void Role::printInfo(ostream& out)const{
-    out << "HP: " << hp << endl;
-    out << "Attack: " << attack << endl;
-    out << "Defense: " << defense << endl;
-    out << "Speed: " << speed << endl;
-}
-
-ostream& operator<<(ostream& out, const Role& R){
-    R.printInfo(out);
-    out << endl;
-    return out;
-}
-
 int Role::get_magicAttack(){
     return 0;
 }
@@ -62,5 +49,9 @@ float Role::get_critRate(){
 }
 
 float Role::get_lifeSteal(){
+    return 0;
+}
+
+int Role::get_maxHP(){
     return 0;
 }

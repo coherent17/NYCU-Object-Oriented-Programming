@@ -105,40 +105,79 @@ int main(){
     cout << "3. Vampire" << endl;
     cin >> p2_choice;
 
+    int hp;
+    int attack;
+    int defense;
+    int speed;
+
+    cout << "Player 1: ";
+    if(p1_choice == MAGE){
+        cout << "Mage" << endl;
+    }
+    else if(p1_choice == WARRIOR){
+        cout << "Warrior" << endl;
+    }
+    else cout << "Vampire" << endl;
+    cout << "HP: "; cin >> hp;
+    cout << "Attack: "; cin >> attack;
+    cout << "Defense: "; cin >> defense;
+    cout << "Speed: "; cin >> speed;
+
     switch(p1_choice){
         case 1:
-            Player1 = new Mage(1);
+            int magicAttack;
+            cout << "Magic Attack: "; cin >> magicAttack;
+            Player1 = new Mage(1, hp, attack, defense, speed, magicAttack);
             break;
         case 2:
-            Player1 = new Warrior(1);
+            float critRate;
+            cout << "Crit Rate: "; cin >> critRate;
+            Player1 = new Warrior(1, hp, attack, defense, speed, critRate);
             break;
         case 3:
-            Player1 = new Vampire(1);
+            float lifeSteal;
+            cout << "Life Steal: "; cin >> lifeSteal;
+            Player1 = new Vampire(1, hp, attack, defense, speed, lifeSteal);
             break;
         default:
             Player1 = nullptr;
             break;
     }
 
+    cout << endl << "Player 2: ";
+    if(p2_choice == MAGE){
+        cout << "Mage" << endl;
+    }
+    else if(p2_choice == WARRIOR){
+        cout << "Warrior" << endl;
+    }
+    else cout << "Vampire" << endl;
+    cout << "HP: "; cin >> hp;
+    cout << "Attack: "; cin >> attack;
+    cout << "Defense: "; cin >> defense;
+    cout << "Speed: "; cin >> speed;
+
     switch(p2_choice){
         case 1:
-            Player2 = new Mage(2);
+            int magicAttack;
+            cout << "Magic Attack: "; cin >> magicAttack;
+            Player2 = new Mage(2, hp, attack, defense, speed, magicAttack);
             break;
         case 2:
-            Player2 = new Warrior(2);
+            float critRate;
+            cout << "Crit Rate: "; cin >> critRate;
+            Player2 = new Warrior(2, hp, attack, defense, speed, critRate);
             break;
         case 3:
-            Player2 = new Vampire(2);
+            float lifeSteal;
+            cout << "Life Steal: "; cin >> lifeSteal;
+            Player2 = new Vampire(2, hp, attack, defense, speed, lifeSteal);
             break;
         default:
             Player2 = nullptr;
             break;
     }
-
-    cout << "Player 1: " << *Player1 << endl;
-    cout << "Player 2: " << *Player2 << endl;
     cout << endl;
-
     int Round = 1;
 
     //check is Player1 play first or not
@@ -163,8 +202,8 @@ int main(){
         if(Play1){
 
             if(p1_choice == VAMPIRE){
-                Player1->set_hp(min(VAMPIRE_HP, Player1->get_hp() + Player1->get_lifeSteal() * VAMPIRE_HP));
-                Player2->set_hp(Player2->get_hp() - (Player1->get_lifeSteal() * VAMPIRE_HP));
+                Player1->set_hp(min(Player1->get_maxHP(), Player1->get_hp() + Player1->get_lifeSteal() * Player1->get_maxHP()));
+                Player2->set_hp(Player2->get_hp() - (Player1->get_lifeSteal() * Player1->get_maxHP()));
                 if(Player2->get_hp() <= 0){
                     cout << "Player 2 lose" << endl;
                     break;
@@ -193,8 +232,8 @@ int main(){
         }
         else{
             if(p2_choice == VAMPIRE){
-                Player2->set_hp(min(VAMPIRE_HP, Player2->get_hp() + Player2->get_lifeSteal() * VAMPIRE_HP));
-                Player1->set_hp(Player1->get_hp() - (Player2->get_lifeSteal() * VAMPIRE_HP));
+                Player2->set_hp(min(Player2->get_maxHP(), Player2->get_hp() + Player2->get_lifeSteal() * Player2->get_maxHP()));
+                Player1->set_hp(Player1->get_hp() - (Player2->get_lifeSteal() * Player2->get_maxHP()));
                 if(Player1->get_hp() <= 0){
                     cout << "Player 1 lose" << endl;
                     break;
@@ -223,6 +262,7 @@ int main(){
         Play1 = !Play1;
         Round++;
     }
-
+    delete Player1;
+    delete Player2;
     return 0;
 }

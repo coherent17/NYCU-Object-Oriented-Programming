@@ -1,6 +1,6 @@
 #include "Mage.h"
 
-Mage::Mage(int playerID):Role(MAGE_HP, MAGE_ATTACK, MAGE_DEFENSE, MAGE_SPEED, false), magicAttack(MAGE_MAGIC_ATTACK){
+Mage::Mage(int playerID, int hp, int attack, int defense, int speed, int magicAttack):Role(hp, attack, defense, speed, false), magicAttack(magicAttack){
     if(playerID == 1){
         DEFAULT_ICON = MAGE_DEFAULT_ICON1;
         ATTACK_ICON = MAGE_ATTACK_ICON1;
@@ -17,12 +17,6 @@ Mage::Mage(int playerID):Role(MAGE_HP, MAGE_ATTACK, MAGE_DEFENSE, MAGE_SPEED, fa
 
 Mage::~Mage(){
 
-}
-
-void Mage::printInfo(ostream& out)const{
-    cout << "Mage" << endl;
-    Role::printInfo(out);
-    out << "Magic Attack: " << magicAttack;
 }
 
 int Mage::get_magicAttack(){

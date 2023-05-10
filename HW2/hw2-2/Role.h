@@ -16,7 +16,7 @@ class Role{
     public:
         Role();
         Role(int _hp, int _attack, int _defense, int _speed, bool _isDenfense);
-        ~Role();
+        virtual ~Role();
 
         int get_hp()const;
         int get_attack()const;
@@ -27,8 +27,6 @@ class Role{
         void set_hp(int);
         void set_isDenfense(bool);
 
-        virtual void printInfo(ostream& out)const;
-        // =0?
         virtual string get_DEFAULT_ICON() = 0;
         virtual string get_ATTACK_ICON() = 0;
         virtual string get_DEFENSE_ICON() = 0;
@@ -36,6 +34,7 @@ class Role{
         virtual int get_magicAttack();
         virtual float get_critRate();
         virtual float get_lifeSteal();
+        virtual int get_maxHP();
         friend ostream& operator<<(ostream& out, const Role& R);
 };
 

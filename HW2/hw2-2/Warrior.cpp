@@ -1,6 +1,6 @@
 #include "Warrior.h"
 
-Warrior::Warrior(int playerID):Role(WARRIOR_HP, WARRIOR_ATTACK, WARRIOR_DEFENSE, WARRIOR_SPEED, false), critRate(WARRIOR_CRIT_RATE){
+Warrior::Warrior(int playerID, int hp, int attack, int defense, int speed, float critRate):Role(hp, attack, defense, speed, false), critRate(critRate){
     if(playerID == 1){
         DEFAULT_ICON = WARRIOR_DEFAULT_ICON1;
         ATTACK_ICON = WARRIOR_ATTACK_ICON1;
@@ -17,12 +17,6 @@ Warrior::Warrior(int playerID):Role(WARRIOR_HP, WARRIOR_ATTACK, WARRIOR_DEFENSE,
 
 Warrior::~Warrior(){
 
-}
-
-void Warrior::printInfo(ostream& out)const{
-    cout << "Warrior" << endl;
-    Role::printInfo(out);
-    out << "Crit Rate: " << critRate;
 }
 
 float Warrior::get_critRate(){

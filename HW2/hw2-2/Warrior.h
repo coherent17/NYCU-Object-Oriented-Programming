@@ -1,12 +1,6 @@
 #ifndef _WARRIOR_H_
 #define _WARRIOR_H_
 
-#define WARRIOR_HP 120
-#define WARRIOR_ATTACK 30
-#define WARRIOR_DEFENSE 20
-#define WARRIOR_SPEED 10
-#define WARRIOR_CRIT_RATE 0.2
-
 #define WARRIOR_DEFAULT_ICON1\
     "  _  "\
     " ( ) "\
@@ -74,9 +68,8 @@ class Warrior: public Role{
         string SHORT_ATTACK_ICON;
 
     public:
-        Warrior(int);
+        Warrior(int playerID, int hp, int attack, int defense, int speed, float critRate);
         ~Warrior();
-        void printInfo(ostream& out)const override;
         float get_critRate()override;
         string get_DEFAULT_ICON()override;
         string get_ATTACK_ICON()override;

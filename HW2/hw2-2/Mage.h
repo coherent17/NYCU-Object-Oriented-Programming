@@ -1,12 +1,6 @@
 #ifndef _MAGE_H_
 #define _MAGE_H_
 
-#define MAGE_HP 100
-#define MAGE_ATTACK 10
-#define MAGE_DEFENSE 10
-#define MAGE_SPEED 5
-#define MAGE_MAGIC_ATTACK 30
-
 #define MAGE_DEFAULT_ICON1\
     " ^_^ "\
     " ( ) "\
@@ -74,9 +68,8 @@ class Mage: public Role{
         string SHORT_ATTACK_ICON;
 
     public:
-        Mage(int);
+        Mage(int playerID, int hp, int attack, int defense, int speed, int magicAttack);
         ~Mage();
-        void printInfo(ostream& out)const override;
         int get_magicAttack()override;
         string get_DEFAULT_ICON()override;
         string get_ATTACK_ICON()override;

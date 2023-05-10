@@ -1,6 +1,7 @@
 #include "Vampire.h"
 
-Vampire::Vampire(int playerID):Role(VAMPIRE_HP, VAMPIRE_ATTACK, VAMPIRE_DEFENSE, VAMPIRE_SPEED, false), lifeSteal(VAMPIRE_LIFESTEAL){
+Vampire::Vampire(int playerID, int hp, int attack, int defense, int speed, float lifeSteal):Role(hp, attack, defense, speed, false), lifeSteal(lifeSteal){
+    maxHP = hp;
     if(playerID == 1){
         DEFAULT_ICON = VAMPIRE_DEFAULT_ICON1;
         ATTACK_ICON = VAMPIRE_ATTACK_ICON1;
@@ -19,14 +20,12 @@ Vampire::~Vampire(){
 
 }
 
-void Vampire::printInfo(ostream& out)const{
-    cout << "Vampire" << endl;
-    Role::printInfo(out);
-    out << "Life Steal: " << lifeSteal;
-}
-
 float Vampire::get_lifeSteal(){
     return lifeSteal;
+}
+
+int Vampire::get_maxHP(){
+    return maxHP;
 }
 
 string Vampire::get_DEFAULT_ICON(){
