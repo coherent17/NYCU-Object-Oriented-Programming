@@ -1,11 +1,5 @@
 #include<bits/stdc++.h>
-
 using namespace std;
-
-#define MAX_GIFT_NAME_SIZE 50
-#define MAX_NAME_SIZE 50
-#define MAX_WANT_NAME_SIZE 50
-#define BUFFER_SIZE 1000
 
 typedef struct _gift_node{
     string gift_name;
@@ -27,11 +21,6 @@ typedef struct _mood_node{
     struct _mood_node *next;
 }mood_node;
 
-typedef struct _host{
-    int count;
-    string *names;
-}host;
-
 mood_node *createMoodNode(int mood_point){
     mood_node *newnode = new mood_node;
     newnode->mood_point = mood_point;
@@ -51,27 +40,39 @@ student_node *createStudentNode(string name, string want_name, string gift_name,
 }
 
 //create the list of mood_node and return the entry of the head
-mood_node **initList(mood_node *&List){
-    int index = 0;
-    mood_node **head_addr = new mood_node *[5];
-    mood_node *tail = List;
-    mood_node *temp = createMoodNode(-2);
-    head_addr[index++] = temp;
-    List = temp;
-    tail = temp;
-    for(int i = -1; i <= 2; i++){
-        temp = createMoodNode(i);
-        head_addr[index++] = temp;
-        tail->next = temp;
-        tail = temp;
-    }
-    return head_addr;
+void initList(mood_node **mhead){
+    (*mhead) = createMoodNode(-2);
+    (*mhead)->next = createMoodNode(-1);
+    (*mhead)->next->next = createMoodNode(0);
+    (*mhead)->next->next->next = createMoodNode(1);
+    (*mhead)->next->next->next->next = createMoodNode(2);
 }
 
-void printList(mood_node *List){
-    mood_node *temp = List;
-    while(temp){
 
+
+void insert_In_Alphabet_Order(mood_node *mhead, student_node *s, int mood_point){
+    mood_node *temp = mhead;
+    for(int i = -2; i < mood_point; i++){
+        temp = temp->next;
+    }
+
+    if(temp->head == nullptr || s->name < (temp->head)->name){
+        s->next = temp->head;
+        temp->head = s;
+    }
+    else{
+        student_node *current = temp->head;
+        while(current->next != nullptr && current->next->name < s->name){
+            current = current->next;
+        }
+        s->next = current->next;
+        current->next = s;
+    }
+}
+
+void printList(mood_node *mhead){
+    mood_node *temp = mhead;
+    while(temp){
         if(temp->head){
             cout << temp->mood_point << " -> ";
             student_node *s = temp->head;
@@ -91,225 +92,223 @@ void printList(mood_node *List){
     cout << endl;
 }
 
-void insert_In_Alphabet_Order(mood_node **&head_addr, student_node *node_to_insert, int mood_point){
-
-    if(head_addr[mood_point+2]->head == nullptr || strcmp(head_addr[mood_point+2]->head->name.c_str(), node_to_insert->name.c_str()) > 0){
-        node_to_insert->next = head_addr[mood_point+2]->head;
-        head_addr[mood_point+2]->head = node_to_insert;
-        return;
-    }
-
-
-    student_node *current = head_addr[mood_point+2]->head;
-    while(current->next != nullptr && strcmp(current->next->name.c_str(), node_to_insert->name.c_str()) < 0){
-        current = current->next;
-    }
-    node_to_insert->next = current->next;
-    current->next = node_to_insert;
-}
-
-void parser(char *filename, int &student_num, gift_node *&gifts, mood_node *&List, mood_node **&head_addr, host &hostInfo, string *&name_order){
-    FILE *input = fopen(filename, "r");
-    fscanf(input, "%d", &student_num);
-
-    gifts = new gift_node[student_num];
-    int gift_index = 0;
-    name_order = new string[student_num];
-    int name_order_index = 0;
-
-    for(int i = 0; i < student_num; i++){
-        char name[MAX_NAME_SIZE], want_name[MAX_NAME_SIZE], gift_name[MAX_GIFT_NAME_SIZE];
-        int good;
-        fscanf(input, "%s %s %s %d", name, want_name, gift_name, &good);
-        name_order[name_order_index++] = string(name);
-        gift_node g;
-        g.gift_name = string(gift_name);
-        g.good = (good == 1) ? true : false;
-        g.given = false;
-        gifts[gift_index] = g;
-        student_node *s = createStudentNode(string(name), string(want_name), string(gift_name), &gifts[gift_index]);
-        insert_In_Alphabet_Order(head_addr, s, 0);
-        gift_index++;
-    }
-    fgetc(input);
-
-    //read the host's friend
-    char buffer[BUFFER_SIZE];
-    char buffer_copy[BUFFER_SIZE];
-    fscanf(input, "%[^\n]", buffer);
-    strncpy(buffer_copy, buffer, strlen(buffer));
-    buffer_copy[strlen(buffer)] = '\0';
-
-    int host_count = 0;
-    char *token = strtok(buffer, " ");
-    while(token != NULL){
-        host_count++;
-        token = strtok(NULL, " ");
-    }
-
-    hostInfo.count = host_count;
-    hostInfo.names = new string [host_count];
-
-    token = strtok(buffer_copy, " ");
-    int index = 0;
-    while(token != NULL){
-        hostInfo.names[index++] = string(token);
-        token = strtok(NULL, " ");
-    }
-    fclose(input);
-}
-
-void printGiftList(gift_node *gifts, int student_num){
-    for(int i = 0; i < student_num; i++){
-        cout << gifts[i].gift_name << ": " << gifts[i].good << " " << gifts[i].given << endl;
-    }
-}
-
-student_node *findPeople(string name, mood_node *List, int *index){
-    mood_node *temp = List;
+student_node *findStudent(string name, mood_node *mhead){
+    mood_node *temp = mhead;
     while(temp){
-        student_node *s = temp->head;
-        while(s){
-            if(!name.compare(s->name)){
-                *index = temp->mood_point;
-                return s;
+        if(temp->head){
+            student_node *s = temp->head;
+            while(s){
+                if(s->name == name){
+                    return s;
+                }
+                s = s->next;
             }
-            s = s->next;
         }
         temp = temp->next;
     }
     return nullptr;
 }
 
-void removeStudentNode(mood_node **&head_addr, student_node *node_to_remove, int mood_point){
-
-    student_node *head = head_addr[mood_point + 2]->head;
-    if(head == node_to_remove){
-        head_addr[mood_point + 2]->head = head_addr[mood_point + 2]->head->next;
-    }
-    else{
-        student_node *temp = head_addr[mood_point + 2]->head;
-        while(temp->next != nullptr){
-            if(temp->next == node_to_remove){
-                temp->next = temp->next->next;
-            }
-            temp = temp->next;
-        }
-    }
-}
-
-void firstChange(host hostInfo, mood_node *&List, mood_node **&head_addr){
-    for(int i = 0; i < hostInfo.count; i++){
-        int mood_point1, mood_point2;
-        student_node *current = findPeople(hostInfo.names[i], List, &mood_point1);
-        student_node *want_people = findPeople(current->want_name, List, &mood_point2);
-        if(!want_people->give->given){
-            want_people->give->given = true;
-            current->get = want_people->give;
-            removeStudentNode(head_addr, current, mood_point1);
-            if(want_people->give->good){
-                current->get = want_people->give;
-                insert_In_Alphabet_Order(head_addr, current, 2);
+void removeStudent(mood_node *mhead, student_node *node_to_remove){
+    mood_node *temp = mhead;
+    while(temp){
+        if(temp->head){
+            student_node *s = temp->head;
+            if(s == node_to_remove){
+                temp->head = temp->head->next;
             }
             else{
-                current->get = want_people->give;
-                insert_In_Alphabet_Order(head_addr, current, -2);
+                while(s->next != nullptr){
+                    if(s->next == node_to_remove){
+                        s->next = s->next->next;
+                        node_to_remove->next = nullptr;
+                        return;
+                    }
+                    s = s->next;
+                }
+                
+            }
+        }
+        temp = temp->next;
+    }
+}
+
+void firstChange(mood_node *mhead, string *hosts, int count){
+    for(int i = 0; i < count; i++){
+        student_node *current = findStudent(hosts[i], mhead);
+        student_node *want_people = findStudent(current->want_name, mhead);
+        if(want_people->give->given == false){
+            want_people->give->given = true;
+            current->get = want_people->give;
+            removeStudent(mhead, current);
+            if(want_people->give->good){
+                insert_In_Alphabet_Order(mhead, current, 2);
+            }
+            else{
+                insert_In_Alphabet_Order(mhead, current, -2);
             }
         }
     }
 }
 
-void secondChange(gift_node *gifts, mood_node **&head_addr, int student_num, mood_node *&List, string *name_order){
-
+void secondChange(mood_node *mhead, gift_node *gifts, int student_num, string *name_order){
     for(int i = 0; i < student_num; i++){
-        int mood_pt;
-        student_node *current = findPeople(name_order[i], List, &mood_pt);
+        student_node *current = findStudent(name_order[i], mhead);
         if(current->get != nullptr) continue;
 
+        //loop through gifts to determine which gift to give to current student
         for(int j = 0; j < student_num; j++){
             if(gifts[j].given == true || current->give == &gifts[j]) continue;
 
+            gifts[j].given = true;
+            current->get = &gifts[j];
+            removeStudent(mhead, current);
+            if(gifts[j].good){
+                insert_In_Alphabet_Order(mhead, current, 1);
+            }
             else{
-                gifts[j].given = true;
-                current->get = &gifts[j];
-                removeStudentNode(head_addr, current, 0);
+                insert_In_Alphabet_Order(mhead, current, -1);
+            }
+            break;
+        }
+    }
+}
 
-                if(gifts[j].good){
-                    insert_In_Alphabet_Order(head_addr, current, 1);
+int getMoodPoint(string name, mood_node *mhead){
+    mood_node *temp = mhead;
+    while(temp){
+        if(temp->head){
+            student_node *s = temp->head;
+            while(s){
+                if(s->name == name){
+                    return temp->mood_point;
                 }
-                else{
-                    insert_In_Alphabet_Order(head_addr, current, -1);
-                }
-                break;
+                s = s->next;
             }
         }
-
+        temp = temp->next;
     }
+    return -100;
 }
 
-void output_mood(string *name_order, mood_node *List, int student_num){
+void outputMood(mood_node *mhead, int student_num, string *name_order){
     for(int i = 0; i < student_num; i++){
-        cout << name_order[i] << " ";
-        int mood_point;
-        student_node *temp = findPeople(name_order[i], List, &mood_point);
-        cout << temp->get->gift_name << " ";
-
-        switch (mood_point){
-            case 2:
-                cout << ":)))" << endl;
-                break;
-
-            case 1:
-                cout << ":)" << endl;
-                break;
-
-            case -1:
-                cout << ":(" << endl;
-                break;
-
-            case -2:
-                cout << ":(((" << endl;
-                break;
+        student_node *temp = findStudent(name_order[i], mhead);
+        int mood_point = getMoodPoint(name_order[i], mhead);
+        cout << name_order[i] << " " << temp->get->gift_name << " ";
+        switch(mood_point){
+            case 2: cout << ":)))" << endl; break;
+            case 1: cout << ":)" << endl; break;
+            case -1: cout << ":(" << endl; break;
+            case -2: cout << ":(((" << endl; break;
         }
     }
 }
 
-void deleteList(mood_node **&head_addr){
-    for(int i = 0; i < 5; i++){
-        while(head_addr[i]->head){
-            student_node *temp = head_addr[i]->head;
-            head_addr[i]->head = head_addr[i]->head->next;
-            delete temp;
-        }
-        delete head_addr[i];
+void deleteList(mood_node **mhead){
+    
+    while((*mhead)->next->next->next->next->head){
+        student_node *temp = (*mhead)->next->next->next->next->head;
+        (*mhead)->next->next->next->next->head = (*mhead)->next->next->next->next->head->next;
+        delete temp;
     }
-    delete [] head_addr;
+    delete (*mhead)->next->next->next->next;
+
+
+    while((*mhead)->next->next->next->head){
+        student_node *temp = (*mhead)->next->next->next->head;
+        (*mhead)->next->next->next->head = (*mhead)->next->next->next->head->next;
+        delete temp;
+    }
+    delete (*mhead)->next->next->next;
+
+
+    while((*mhead)->next->next->head){
+        student_node *temp = (*mhead)->next->next->head;
+        (*mhead)->next->next->head = (*mhead)->next->next->head->next;
+        delete temp;
+    }
+    delete (*mhead)->next->next;
+
+
+    while((*mhead)->next->head){
+        student_node *temp = (*mhead)->next->head;
+        (*mhead)->next->head = (*mhead)->next->head->next;
+        delete temp;
+    }
+    delete (*mhead)->next;
+
+
+    while((*mhead)->head){
+        student_node *temp = (*mhead)->head;
+        (*mhead)->head = (*mhead)->head->next;
+        delete temp;
+    }
+    delete (*mhead);
 }
 
 int main(int argc, char *argv[]){
-    
-    //create the list (mood_node linkedlist)
-    mood_node *List;
-    mood_node **head_addr = initList(List);
-    gift_node *gifts = nullptr;
 
     int student_num;
-    host hostInfo;
-    string *name_order;
-    parser(argv[1], student_num, gifts, List, head_addr, hostInfo, name_order);
-    printList(List);    //initial state: all mood point = 0
+    string line;
+    ifstream fin(argv[1]);
+    getline(fin, line);
+    student_num = stoi(line);
+    
+    gift_node *gifts = new gift_node[student_num];
+    mood_node *mhead = nullptr;
+    initList(&mhead);
+    string *name_order = new string[student_num];
 
-    firstChange(hostInfo, List, head_addr);
-    printList(List);
+    for(int i = 0; i < student_num; i++){
+        string line;
+        getline(fin, line);
+        stringstream ss(line);
+        string name, want_name, gift_name;
+        char isgood;
+        ss >> name >> want_name >> gift_name >> isgood;
+        name_order[i] = name;
+        gifts[i].gift_name = gift_name;
+        gifts[i].good = (isgood == '1') ? true : false;
+        gifts[i].given = false;
+        student_node *s = createStudentNode(name, want_name, gift_name, &gifts[i]);
+        insert_In_Alphabet_Order(mhead, s, 0);
+    }
 
-    secondChange(gifts, head_addr, student_num, List, name_order);
-    printList(List);
+    //before gift exchange
+    printList(mhead);
 
-    output_mood(name_order, List, student_num);
+    //read the host
+    string hosts_line;
+    int count = 0;
+    string hosts_copy;
+    getline(fin, hosts_line);
+    hosts_copy = hosts_line;
+    stringstream ss(hosts_copy);
+    while(ss >> hosts_copy){
+        count++;
+    }
+    string *hosts = new string[count];
+    ss.clear();
+    ss.str(hosts_line);
+    for(int i = 0; i < count; i++){
+        ss >> hosts[i];
+    }
 
-    delete [] name_order;
-    delete [] gifts;
-    delete [] hostInfo.names;
-    deleteList(head_addr);
-    return 0;
+    //make first change
+    firstChange(mhead, hosts, count);
+    printList(mhead);
+
+    //make second change
+    secondChange(mhead, gifts, student_num, name_order);
+    printList(mhead);
+
+    //output the moodpoint
+    outputMood(mhead, student_num, name_order);
+
+    fin.close();
+    delete []gifts;
+    delete []name_order;
+    delete []hosts;
+    deleteList(&mhead);
 }
