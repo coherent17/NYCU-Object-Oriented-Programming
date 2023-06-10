@@ -1,0 +1,29 @@
+class Point2D
+{
+private:
+    int x;
+    int y;
+public:
+    Point2D();
+    Point2D(int, int );
+    void SetXY(int, int);
+    friend ostream &operator<<(ostream &, Point2D);
+};
+
+template <class T>
+class Hash_table{
+    class Hash{
+        public:
+            T value;
+            Hash *next;
+    };
+    private:
+        int key;
+        Hash *head[10];
+    public:
+        //constructor if needed
+        void insert(T);
+        void sort(int);
+        void search(T);
+        void show();
+};
