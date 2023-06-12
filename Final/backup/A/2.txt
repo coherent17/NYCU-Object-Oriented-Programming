@@ -1,0 +1,6 @@
+H Vitamin 20 3 CA 10 CB 15 CA 25
+F Curry 8 10 12 10
+F Beef 10 5 23 18
+F Rice 3 10 0 0
+H BlueBerry 8 14 sugar 3 E 4 A 5 B 1 SOD 2 Protein 6 K 7 sugar 3 E 4 A 5 B 1 SOD 2 Protein 6 K 7
+H Job's_tear 5 5 Protein 13 Fat 6 Minerals 1 Fiber 1 Vitamin 6 
